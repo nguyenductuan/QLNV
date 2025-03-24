@@ -56,7 +56,7 @@ public class ProductController {
 
     // thêm mới 1 sản phấm
     @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
-    public ResponseEntity<Void> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
+    public ResponseEntity<Product> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
         String filename = storeFile(productDto.getAvatarImage());
         Product proiduct = productService.createproduct(productDto, filename);
         return ResponseEntity.ok(proiduct);
