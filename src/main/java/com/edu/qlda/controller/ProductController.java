@@ -88,7 +88,7 @@ public class ProductController {
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Integer productId) {
         productService.deleteproduct(productId);
-        return ResponseEntity.ok("Sản phẩm đã xóa");
+        return ResponseEntity.ok("Sản phẩm đã được xóa");
     }
 
     //Hàm xem thông tin ảnh
