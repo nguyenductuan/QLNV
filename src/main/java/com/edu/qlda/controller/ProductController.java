@@ -1,7 +1,25 @@
 package com.edu.qlda.controller;
 
+import com.edu.qlda.dto.ProductDto;
+import com.edu.qlda.entity.Product;
+import com.edu.qlda.service.ProductService;
 
+import org.springframework.core.io.Resource;
+import org.springframework.core.io.UrlResource;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
+import org.springframework.util.StringUtils;
+import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
+import java.io.IOException;
+import java.net.MalformedURLException;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.*;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -69,7 +87,7 @@ public class ProductController {
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Integer productId) {
         productService.deleteproduct(productId);
-      return ResponseEntity.status(HttpStatus.OK).build();
+        return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Hàm xem thông tin ảnh
