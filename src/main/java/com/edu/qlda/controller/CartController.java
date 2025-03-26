@@ -21,7 +21,7 @@ public class CartController {
         this.cartService=cartService;
     }
 
-    private static final String ACTION_SUCCESS = "Thành cong";
+    private static final String ACTION_SUCCESS = "Thành công";
     @PostMapping("cart/add-product")
 
     public  ResponseEntity<Messageresponse<Void>> addProductToCart(@RequestBody CartrequestDto request) {
