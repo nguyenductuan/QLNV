@@ -21,7 +21,6 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
 
-
 @RestController
 @CrossOrigin("http://localhost:4200")
 public class ProductController {
