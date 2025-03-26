@@ -3,7 +3,7 @@ package com.edu.qlda.controller;
 import com.edu.qlda.dto.ProductDto;
 import com.edu.qlda.entity.Product;
 import com.edu.qlda.service.ProductService;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -20,7 +20,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
-import java.util.stream.Collectors;
+
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -58,8 +58,8 @@ public class ProductController {
     @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
     public ResponseEntity<Product> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
         String filename = storeFile(productDto.getAvatarImage());
-        Product proiduct = productService.createproduct(productDto, filename);
-        return ResponseEntity.ok(proiduct);
+        Product product = productService.createproduct(productDto, filename);
+        return ResponseEntity.status(HttpStatus.CREATED).body(product);
     }
 
     private String storeFile(MultipartFile file) throws IOException {
@@ -88,7 +88,7 @@ public class ProductController {
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<Void> deleteProduct(@PathVariable("id") Integer productId) {
         productService.deleteproduct(productId);
-        return ResponseEntity.ok("Sản phẩm đã được xóa");
+      return ResponseEntity.status(HttpStatus.OK).build();
     }
 
     //Hàm xem thông tin ảnh

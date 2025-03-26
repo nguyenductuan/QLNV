@@ -1,9 +1,6 @@
 package com.edu.qlda.repository;
 
-import com.edu.qlda.dto.EmployeelistDto;
-import com.edu.qlda.dto.EmployeesDto;
-import com.edu.qlda.dto.EmployeesearchDto;
-import com.edu.qlda.dto.EmployeeupdateDto;
+import com.edu.qlda.dto.*;
 import com.edu.qlda.entity.Employee;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -14,6 +11,7 @@ import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
 
+import java.time.LocalDate;
 import java.util.List;
 
 public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
@@ -63,7 +61,9 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             "e.phone = :#{#employee.phone}, e.status = :#{#employee.status}, e.updatedate = :#{#employee.updatedate} " +
             "WHERE e.employee_id = :employeeId",
             nativeQuery = true)
-    void editEmployee(@Param("employee") EmployeeupdateDto employee, @Param("employeeId") Integer employeeId);
+    void editEmployee(@Param("employee") EmployeeEditDto request,
+                      @Param("update") LocalDate updatedate,
+                      @Param("employeeId") Integer employeeId);
 
     @Query(value = "select e.employee_id as employee_id, e.name, p.name as position, r.name as role, e.email," +
             "e.address,e.gender,e.phone,e.status,e.birthday,e.createdate,e.updatedate" +
@@ -87,7 +87,8 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Modifying
     @Query(value = "INSERT INTO `employee` (`name`, `phone`, `email`, `status`, `role_id`, `position_id`, `address`, `createdate`, `updatedate`, `password`, `gender`, `birthday`) " +
             "VALUES (:#{#employee.name}, :#{#employee.phone}, :#{#employee.email}, :#{#employee.status}, :#{#employee.role}, :#{#employee.position}, " +
-            ":#{#employee.address}, :#{#employee.createdate}, :#{#employee.updatedate}, :#{#employee.password}, :#{#employee.gender}, :#{#employee.birthday})",
+            ":#{#employee.address}, :createdate, :updatedate, :#{#employee.password}, :#{#employee.gender}, :#{#employee.birthday})",
             nativeQuery = true)
-    void createEmployee(@Param("employee") EmployeesDto employee);
+    void createEmployee(@Param("employee") EmployeecreateDto request, @Param("createdate") LocalDate createdate,
+                        @Param("updatedate") LocalDate updatedate);
 }

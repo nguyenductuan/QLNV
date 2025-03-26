@@ -14,14 +14,12 @@ import java.util.Set;
 public class Role {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JoinColumn(name = "role_id")
+    @Column(name = "role_id")
     private Integer roleid;
     private String name;
     @OneToMany(mappedBy = "role")
     @JsonBackReference
     private Set<Employee> employeeList;
-
-
 
     @JsonCreator
     public Role(String roleId) {

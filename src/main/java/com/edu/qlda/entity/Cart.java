@@ -13,12 +13,10 @@ public class Cart {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @JoinColumn(name = "cart_id")
-    private Integer cartid;
+    private Integer cartId;
     @ManyToOne
     @JoinColumn(name = "employee_id")
     private Employee employee;
-
-
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;

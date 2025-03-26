@@ -42,37 +42,11 @@ public class EmployeeService {
         }
         LocalDate createdate = LocalDate.now();
         LocalDate updatedate = null;
-         employeeRepository.createEmployee(
-                request.getName(),
-                request.getPhone(),
-                request.getEmail(),
-                request.getStatus(),
-                request.getRole(),
-                request.getPosition(),
-                request.getAddress(),
-                createdate,
-                updatedate,
-                request.getPassword(),
-                request.getGender(),
-                request.getBirthday());
+       employeeRepository.createEmployee(request,createdate,updatedate);
     }
     public void updateemployee(EmployeeEditDto request) {
         LocalDate updatedate = LocalDate.now();
-
-        employeeRepository.editEmployee(
-                request.getName(),
-                Integer.parseInt(request.getPosition()),
-                Integer.parseInt(request.getRole()),
-                request.getPassword(),
-                request.getAddress(),
-                request.getBirthday(),
-                request.getEmail(),
-                request.getGender(),
-                request.getPhone(),
-                request.getStatus(),
-                updatedate,
-                request.getEmployeeId()
-        );
+        employeeRepository.editEmployee(request,updatedate, request.getEmployeeId());
     }
 
     public List<EmployeelistDto> searchEmployee(String name) {

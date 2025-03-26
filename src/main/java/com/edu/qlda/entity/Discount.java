@@ -13,7 +13,7 @@ public class Discount {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @JoinColumn(name = "discount_id")
+    @Column(name = "discount_id")
     private Integer discountid;
     private String discountname;
     private Integer discountPercentage;
