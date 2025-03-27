@@ -6,6 +6,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 
+
+import java.time.LocalDate;
+
+
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -19,6 +24,8 @@ public class Product {
     private Integer price;
     private Integer quantity;
     private String thumbnail;
+    private LocalDate createdate;
+    private LocalDate updatedate;
     @ManyToOne
     @JoinColumn(name = "category_id")
     private Category category;
