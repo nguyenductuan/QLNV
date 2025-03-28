@@ -13,7 +13,7 @@ public class ProductDto {
     Integer price;
     String thumbnail;
     Integer quantity;
-   @JsonProperty("category_id")
+    @JsonProperty("category_id")
     Integer categoryid;
     private MultipartFile avatarImage;
 

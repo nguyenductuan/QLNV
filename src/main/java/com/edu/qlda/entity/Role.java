@@ -22,8 +22,8 @@ public class Role {
     private Set<Employee> employeeList;
 
     @JsonCreator
-    public Role(String roleId) {
-        this.roleid = Math.toIntExact(Long.parseLong(roleId)); // Chuyển đổi chuỗi thành Long (hoặc Integer, tùy vào yêu cầu)
+    public Role(Integer roleId) {
+        this.roleid = Math.toIntExact((roleId));
         this.name = "Role " + roleId; // Ví dụ, bạn có thể gán tên cho Role từ ID hoặc để trống
     }
 

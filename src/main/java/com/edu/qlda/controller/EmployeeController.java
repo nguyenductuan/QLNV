@@ -1,21 +1,19 @@
 package com.edu.qlda.controller;
-
 import com.edu.qlda.dto.*;
-
 import com.edu.qlda.entity.Employee;
 import com.edu.qlda.entity.Position;
-
 import com.edu.qlda.entity.Role;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.EmployeeService;
 import com.edu.qlda.service.PositionService;
 import com.edu.qlda.service.RoleService;
+import jakarta.validation.Valid;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
-
 import java.util.List;
 
 @RestController
@@ -31,7 +29,6 @@ public class EmployeeController {
         this.positionService = positionService;
         this.roleService = roleService;
     }
-
     //Lấy ds cá nhân
     @GetMapping("/employee")
     public List<EmployeelistDto> getAllEmployees(@RequestParam(defaultValue = "0") int page,
@@ -39,66 +36,61 @@ public class EmployeeController {
         Pageable pageable = PageRequest.of(page, size);
         return employeeService.findAllEmployee(pageable);
     }
-
     //Lấy ds cá nhân
     @GetMapping("/position")
     public List<Position> getAllPosition() {
         return positionService.listPosition();
     }
-
     @GetMapping("/role")
     public List<Role> getAllRole() {
         return roleService.listRole();
     }
-
     // Lấy ds cá nhân theo id
     @GetMapping("/employeebyId")
     public EmployeelistDto employeeById(int id) {
         return employeeService.findEmployeeId(id);
     }
-
     //Search cá nhân
     @GetMapping("/employee/search")
     public List<EmployeelistDto> search(@RequestParam(name = "name", required = false) String name) {
         return employeeService.searchEmployee(name);
     }
-
     @PostMapping("searchadvance")
     public List<EmployeelistDto> searchadvance(@RequestBody EmployeesearchDto employeesearchDto) {
         return employeeService.searchadvance(employeesearchDto
         );
     }
-
     // Thêm mới cá nhân
     @PostMapping("/addemployee")
-    public ResponseEntity<Messageresponse<Void>> createemployee(@RequestBody EmployeecreateDto employeeDto) {
+    public ResponseEntity<Messageresponse<Employee>> createemployee(@Valid @RequestBody Employee employeeDto, BindingResult bindingResult) {
         try {
+            if (bindingResult.hasErrors()) {
+                Messageresponse<Employee> response = new Messageresponse<>(201, bindingResult.getFieldError().getDefaultMessage());
+            return ResponseEntity.ok(response);
+        }
             employeeService.createemployee(employeeDto);
-            Messageresponse<Void> response = new Messageresponse<>(200, ACTIONSUCESS);
+            Messageresponse<Employee> response = new Messageresponse<>(200, ACTIONSUCESS);
             return ResponseEntity.ok(response);
         }
         // Xử lý ngoại lệ các dữ lệu
-        catch (RuntimeException e) {
-            Messageresponse<Void> response = new Messageresponse<>(409, e.getMessage());
+        catch (Exception e) {
+            Messageresponse<Employee> response = new Messageresponse<>(409, e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
 
     //Cập nật cá nhân
-    @PutMapping("/updateemployee")
-    public ResponseEntity<Messageresponse<Void>> updateemployee(@RequestBody EmployeeEditDto employeeEditDto) {
+    @PutMapping("/updateemployee/{id}")
+    public ResponseEntity<Messageresponse<Void>> updateemployee(@RequestBody Employee employeeEditDto, @PathVariable Integer id) {
         try {
-
-            employeeService.updateemployee(employeeEditDto);
+            employeeService.updateemployee(employeeEditDto,id);
             Messageresponse<Void> response = new Messageresponse<>(200, ACTIONSUCESS);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
             Messageresponse<Void> response = new Messageresponse<>(409, e.getMessage());
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
-
     }
-
     //Xóa cá nhân
     @DeleteMapping("delete-employee/{id}")
     public void deleteemployee(@PathVariable Integer id) {

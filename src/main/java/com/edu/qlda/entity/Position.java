@@ -22,8 +22,8 @@ public class Position {
     private Set<Employee> employeeList;
 
     @JsonCreator
-    public Position(String positionid) {
-        this.positionId = Math.toIntExact(Long.parseLong(positionid)); // Chuyển đổi chuỗi thành Long (hoặc Integer, tùy vào yêu cầu)
+    public Position(Integer positionid) {
+        this.positionId = Math.toIntExact((positionid));
         this.name = "Position " + positionid; // Ví dụ, bạn có thể gán tên cho Role từ ID hoặc để trống
     }
 }
