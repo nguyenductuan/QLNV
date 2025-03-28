@@ -18,16 +18,19 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             " from employee e inner join position p on p.position_id =e.position_id inner join role r on e.role_id = r.role_id ",
             nativeQuery = true)
     List<EmployeelistDto> findAllEmployee(Pageable pageable);
+
     boolean existsByEmail(String email);
+
     @Query(value = "select e.employee_id as employee_id, e.name, p.name as position, r.name as role, e.email," +
             "e.address,e.gender,e.phone,e.status,e.birthday,e.createdate,e.updatedate" +
             " from employee e inner join position p on p.position_id =e.position_id inner join role r on e.role_id = r.role_id ",
             nativeQuery = true)
     List<EmployeelistDto> findAllEmployees();
+
     @Query(value = "SELECT * FROM employee u WHERE u.role =1 and  (LOWER(u.name) LIKE LOWER(CONCAT('%', :name, '%')) OR :name IS NULL) " +
             "AND (LOWER(u.email) LIKE LOWER(CONCAT('%', :email, '%')) OR :email IS NULL)", nativeQuery = true)
-    List<EmployeelistDto> searchemployees (@Param("name") String name,
-                                           @Param("email") String email);
+    List<EmployeelistDto> searchemployees(@Param("name") String name,
+                                          @Param("email") String email);
 
     @Query(value =
             "select e.employee_id as employee_id, e.name, p.name as position, r.name as role, e.email,e.address,e.gender,e.phone,e.status,e.birthday,e.createdate,e.password,e.updatedate,e.position_id, e.role_id from employee e inner join position p on p.position_id =e.position_id inner join role r on e.role_id = r.role_id where e.employee_id =?", nativeQuery = true)
@@ -37,6 +40,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
     @Modifying
     @Query(value = "DELETE FROM employee WHERE employee_id=?", nativeQuery = true)
     void deleteemployee(Integer id);
+
     @Query(value = "select * from employee e  where (e.name like%:name% OR :name is null)",
             countQuery = "select count(*) from employee e where (e.name like%:name% OR :name is null)", nativeQuery = true)
     Page<Employee> search(@Param(value = "name") String name, Pageable pageable);
@@ -47,7 +51,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             " from employee e inner join position p on p.position_id =e.position_id inner join role r on e.role_id = r.role_id " +
             "where (e.name like %:name% OR :name is null)",
             nativeQuery = true)
-    List<EmployeelistDto> searchemployee( @Param("name") String name);
+    List<EmployeelistDto> searchemployee(@Param("name") String name);
 
     @Query(value = "select * from employee where email = ? ", nativeQuery = true)
     Employee findByName(String email);
@@ -66,7 +70,6 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             " and (e.address like %:#{#search.address}% OR :#{#search.address} is null)" +
             "and e.createdate >= :#{#search.startDate} AND e.createdate <=: #{#search.endDate}",
             nativeQuery = true)
-
-  List<EmployeelistDto> searchEmployeesWithDateRange(@Param("search") EmployeesearchDto search);
+    List<EmployeelistDto> searchEmployeesWithDateRange(@Param("search") EmployeesearchDto search);
 
 }

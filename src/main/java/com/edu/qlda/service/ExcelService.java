@@ -31,6 +31,10 @@ public class ExcelService {
             titleFont.setBold(true);
             titleFont.setFontHeightInPoints((short) 16);
             titleStyle.setFont(titleFont);
+            //Bổ sung căn giữa text tiêu đề
+            titleStyle.setAlignment(HorizontalAlignment.CENTER);
+            titleStyle.setVerticalAlignment(VerticalAlignment.CENTER);
+
             titleCell.setCellStyle(titleStyle);
 
             // Merge ô tiêu đề (từ cột 0 đến 8)

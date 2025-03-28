@@ -36,7 +36,7 @@ public  OrderService(OrderRepository orderRepository, ProductRepository productR
         orders.setEmail(orderDto.getEmail());
         orders.setTotalAmount(orderDto.getTotalAmount());
         orders.setPaymentStatus("Pending");
-        orderRepository.save(orders);// hàm save vào DB có vấn đề bị nhân đôi bản ghi
+        orderRepository.save(orders);
         // Tạo danh sách các đối tượng OrderDetail từ CartItem
         List<OrderDetail> orderDetails = new ArrayList<>();
         for (CartItem cartItemdto : orderDto.getCartItem()) {

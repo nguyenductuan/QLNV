@@ -1,4 +1,5 @@
 package com.edu.qlda.controller;
+
 import com.edu.qlda.dto.*;
 import com.edu.qlda.entity.Employee;
 import com.edu.qlda.entity.Position;
@@ -19,7 +20,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
-
 import java.io.ByteArrayInputStream;
 import java.util.List;
 
@@ -76,14 +76,12 @@ public class EmployeeController {
     @PostMapping("/addemployee")
     public ResponseEntity<Messageresponse<Employee>> createemployee(@Valid @RequestBody Employee employeeDto, BindingResult bindingResult) {
         try {
-
             if (bindingResult.hasErrors()) {
                 FieldError fieldError = bindingResult.getFieldError();
                 String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
-
-                Messageresponse<Employee> response = new Messageresponse<>(201 ,message );
-            return ResponseEntity.ok(response);
-        }
+                Messageresponse<Employee> response = new Messageresponse<>(201, message);
+                return ResponseEntity.ok(response);
+            }
             employeeService.createemployee(employeeDto);
             Messageresponse<Employee> response = new Messageresponse<>(200, ACTIONSUCESS);
             return ResponseEntity.ok(response);
@@ -98,7 +96,7 @@ public class EmployeeController {
     @PutMapping("/updateemployee/{id}")
     public ResponseEntity<Messageresponse<Void>> updateemployee(@RequestBody Employee employeeEditDto, @PathVariable Integer id) {
         try {
-            employeeService.updateemployee(employeeEditDto,id);
+            employeeService.updateemployee(employeeEditDto, id);
             Messageresponse<Void> response = new Messageresponse<>(200, ACTIONSUCESS);
             return ResponseEntity.ok(response);
         } catch (RuntimeException e) {
@@ -111,7 +109,6 @@ public class EmployeeController {
     public void deleteemployee(@PathVariable Integer id) {
         employeeService.deleteemployee(id);
     }
-
     @PostMapping(value = "/login")
     public ResponseEntity<Messageresponse<Void>> login(@RequestBody Loginrequest request) {
         String email = request.getEmail();
@@ -132,7 +129,6 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
-
     @GetMapping("/export-excel")
     public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
         List<Employee> employees = employeeService.listemployee();
@@ -143,6 +139,5 @@ public class EmployeeController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
-
     }
 }
