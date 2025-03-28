@@ -5,15 +5,22 @@ import com.edu.qlda.entity.Position;
 import com.edu.qlda.entity.Role;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.EmployeeService;
+import com.edu.qlda.service.ExcelService;
 import com.edu.qlda.service.PositionService;
 import com.edu.qlda.service.RoleService;
 import jakarta.validation.Valid;
+import org.springframework.core.io.InputStreamResource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
+
+import java.io.ByteArrayInputStream;
 import java.util.List;
 
 @RestController
@@ -23,11 +30,16 @@ public class EmployeeController {
     private final EmployeeService employeeService;
     private final PositionService positionService;
     private final RoleService roleService;
+    private final ExcelService excelService;
 
-    public EmployeeController(EmployeeService employeeService, PositionService positionService, RoleService roleService) {
+    public EmployeeController(EmployeeService employeeService,
+                              PositionService positionService,
+                              RoleService roleService,
+                              ExcelService excelService) {
         this.employeeService = employeeService;
         this.positionService = positionService;
         this.roleService = roleService;
+        this.excelService = excelService;
     }
     //Lấy ds cá nhân
     @GetMapping("/employee")
@@ -64,8 +76,12 @@ public class EmployeeController {
     @PostMapping("/addemployee")
     public ResponseEntity<Messageresponse<Employee>> createemployee(@Valid @RequestBody Employee employeeDto, BindingResult bindingResult) {
         try {
+
             if (bindingResult.hasErrors()) {
-                Messageresponse<Employee> response = new Messageresponse<>(201, bindingResult.getFieldError().getDefaultMessage());
+                FieldError fieldError = bindingResult.getFieldError();
+                String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
+
+                Messageresponse<Employee> response = new Messageresponse<>(201 ,message );
             return ResponseEntity.ok(response);
         }
             employeeService.createemployee(employeeDto);
@@ -78,7 +94,6 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
         }
     }
-
     //Cập nật cá nhân
     @PutMapping("/updateemployee/{id}")
     public ResponseEntity<Messageresponse<Void>> updateemployee(@RequestBody Employee employeeEditDto, @PathVariable Integer id) {
@@ -116,5 +131,18 @@ public class EmployeeController {
             // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
+    }
+
+    @GetMapping("/export-excel")
+    public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
+        List<Employee> employees = employeeService.listemployee();
+        ByteArrayInputStream in = excelService.generateExcel(employees);
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Content-Disposition", "attachment; filename=employees.xlsx");
+        return ResponseEntity.ok()
+                .headers(headers)
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .body(new InputStreamResource(in));
+
     }
 }
