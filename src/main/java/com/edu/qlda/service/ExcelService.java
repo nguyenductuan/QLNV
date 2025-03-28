@@ -24,7 +24,6 @@ public class ExcelService {
             Row titleRow = sheet.createRow(rowIdx++);
             Cell titleCell = titleRow.createCell(0);
             titleCell.setCellValue("Danh sách nhân viên");
-
             // Style cho tiêu đề lớn
             CellStyle titleStyle = workbook.createCellStyle();
             Font titleFont = workbook.createFont();
