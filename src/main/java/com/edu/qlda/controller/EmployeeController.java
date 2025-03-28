@@ -115,8 +115,9 @@ public class EmployeeController {
         String password = request.getPassword();
         Employee employee = employeeService.isUserValid(email, password);
         if (employee != null) {
+
             // Tạo một Response object
-            Messageresponse response = new Messageresponse(
+            Messageresponse  response = new Messageresponse(
                     200, ACTIONSUCESS,
                     new Employee[]{employee}
             );
