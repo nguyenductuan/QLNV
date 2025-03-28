@@ -2,8 +2,8 @@ package com.edu.qlda.service;
 
 import com.edu.qlda.dto.*;
 import com.edu.qlda.entity.Employee;
-import com.edu.qlda.exception.EmployeeAlreadyExistsException;
-import com.edu.qlda.exception.ProductNotFoundException;
+import com.edu.qlda.exception.ValidationException;
+
 import com.edu.qlda.repository.EmployeeRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
@@ -49,7 +49,7 @@ public class EmployeeService {
     }
     public void createemployee(@Valid Employee request) {
         if (isEmployeeEmailExist(request.getEmail())) {
-            throw new EmployeeAlreadyExistsException("Nhân viên đã tồn tại trong hệ thống");
+            throw new ValidationException("Nhân viên đã tồn tại trong hệ thống");
         }
         request.setCreatedate(LocalDate.now());
         employeeRepository.save(request);
@@ -62,7 +62,7 @@ public class EmployeeService {
             existingEmployee = employee.get();
             // Tiếp tục xử lý product
         } else {
-            throw new EmployeeAlreadyExistsException("Nhân viên không tồn tại trong hệ thống");
+            throw new ValidationException("Nhân viên không tồn tại trong hệ thống");
         }
         existingEmployee.setName(request.getName());
         existingEmployee.setPhone(request.getPhone());
@@ -89,5 +89,8 @@ public class EmployeeService {
 
     public List<EmployeelistDto> searchadvance(EmployeesearchDto search) {
         return employeeRepository.searchEmployeesWithDateRange(search);
+    }
+    public List<Employee> listemployee() {
+        return employeeRepository.findAll();
     }
 }
