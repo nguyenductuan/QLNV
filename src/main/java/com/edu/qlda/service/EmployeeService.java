@@ -7,7 +7,7 @@ import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.EmployeeRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,8 +24,8 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<EmployeelistDto> findAllEmployee(Pageable pageable) {
-        return employeeRepository.findAllEmployee(pageable);
+    public List<EmployeelistDto> findAllEmployee() {
+        return employeeRepository.findAllEmployee();
     }
 
     public EmployeelistDto findEmployeeId(int id) {

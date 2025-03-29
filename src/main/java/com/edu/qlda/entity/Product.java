@@ -21,6 +21,7 @@ public class Product {
     @JoinColumn(name = "product_id")
     private Integer productId;
     private String name;
+
     private Integer price;
     private Integer quantity;
     private String thumbnail;

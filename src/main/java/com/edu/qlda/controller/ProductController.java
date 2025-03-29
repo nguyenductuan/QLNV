@@ -1,6 +1,7 @@
 package com.edu.qlda.controller;
 import com.edu.qlda.dto.ProductDto;
 
+
 import com.edu.qlda.entity.Product;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.ProductService;
@@ -10,6 +11,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
+import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -55,7 +58,7 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     @PutMapping(value = "/updateproduct/{id}",consumes = "multipart/form-data")
-    public ResponseEntity<Messageresponse<Product>> updateProduct( @ModelAttribute ProductDto productDto, @PathVariable Integer id) throws IOException {
+    public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto, BindingResult bindingResult, @PathVariable Integer id) throws IOException {
          String filename = storeFile(productDto.getAvatarImage());
          Product product = productService.updateproduct(productDto, id, filename);
          Messageresponse<Product> response = new Messageresponse<>(202,"Cập nhật sản phẩm thành công",product);

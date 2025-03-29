@@ -11,8 +11,7 @@ import com.edu.qlda.service.PositionService;
 import com.edu.qlda.service.RoleService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.data.domain.PageRequest;
-import org.springframework.data.domain.Pageable;
+
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
@@ -39,14 +38,13 @@ public class EmployeeController {
         this.employeeService = employeeService;
         this.positionService = positionService;
         this.roleService = roleService;
-        this.excelService = excelService; //
+        this.excelService = excelService;
     }
     //Lấy ds cá nhân
     @GetMapping("/employee")
-    public List<EmployeelistDto> getAllEmployees(@RequestParam(defaultValue = "0") int page,
-                                                 @RequestParam(defaultValue = "10") int size) {
-        Pageable pageable = PageRequest.of(page, size);
-        return employeeService.findAllEmployee(pageable);
+    public List<EmployeelistDto> getAllEmployees() {
+
+        return employeeService.findAllEmployee();
     }
     //Lấy ds cá nhân
     @GetMapping("/position")
@@ -130,7 +128,7 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
-    @GetMapping("/export-excel")
+    @GetMapping("employee/export-excel")
     public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
         List<Employee> employees = employeeService.listemployee();
         ByteArrayInputStream in = excelService.generateExcel(employees);
