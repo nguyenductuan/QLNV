@@ -57,6 +57,9 @@ public class EmployeeService {
     public void updateemployee(Employee request, Integer id) {
         LocalDate updatedate = LocalDate.now();
         Optional<Employee> employee = employeeRepository.findById(id);
+        if (isEmployeeEmailExist(request.getEmail())) {
+            throw new ValidationException("Nhân viên đã tồn tại trong hệ thống");
+        }
         Employee existingEmployee;
         if (employee.isPresent()) {
             existingEmployee = employee.get();
@@ -74,8 +77,6 @@ public class EmployeeService {
         existingEmployee.setRole(request.getRole());
         existingEmployee.setUpdatedate(updatedate);
         employeeRepository.save(existingEmployee);
-
-
     }
 
     public List<EmployeelistDto> searchEmployee(String name) {
