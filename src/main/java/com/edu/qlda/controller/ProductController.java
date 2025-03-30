@@ -2,9 +2,11 @@ package com.edu.qlda.controller;
 import com.edu.qlda.dto.ProductDto;
 
 
+
 import com.edu.qlda.entity.Product;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.ProductService;
+import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
 import org.springframework.http.HttpStatus;
@@ -13,6 +15,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
+import org.springframework.validation.FieldError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 import java.io.IOException;
@@ -51,8 +54,17 @@ public class ProductController {
     }
     // thêm mới 1 sản phấm
     @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
-    public ResponseEntity<Messageresponse<Product>> addProduct(@ModelAttribute ProductDto productDto) throws IOException {
+    public ResponseEntity<Messageresponse<Product>> addProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) throws IOException {
         String filename = storeFile(productDto.getAvatarImage());
+        if (bindingResult.hasErrors()) {
+
+
+            FieldError fieldError = bindingResult.getFieldError();
+            String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
+
+            Messageresponse<Product> response = new Messageresponse<>(201, message);
+            return ResponseEntity.ok(response);
+        }
         Product product = productService.createproduct(productDto, filename);
         Messageresponse<Product> response = new Messageresponse<>(200,"Thêm mới sản phẩm thành công", product);
         return ResponseEntity.ok(response);

@@ -49,12 +49,12 @@ public class EmployeeController {
         return employeeService.findAllEmployee();
     }
 
-    //Lấy ds cá nhân
+    //Lấy ds chức vụ
     @GetMapping("/position")
     public List<Position> getAllPosition() {
         return positionService.listPosition();
     }
-
+    //Lấy danh sách quyền
     @GetMapping("/role")
     public List<Role> getAllRole() {
         return roleService.listRole();
@@ -132,7 +132,7 @@ public class EmployeeController {
         if (employee != null) {
 
             // Tạo một Response object
-            Messageresponse response = new Messageresponse(
+            Messageresponse<Void> response = new Messageresponse(
                     200, ACTIONSUCESS,
                     new Employee[]{employee}
             );
@@ -145,6 +145,7 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
+    //Xuất Excel
     @GetMapping("employee/export-excel")
     public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
         List<Employee> employees = employeeService.listemployee();
