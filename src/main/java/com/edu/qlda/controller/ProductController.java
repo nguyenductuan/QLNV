@@ -16,8 +16,11 @@ import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
 import org.springframework.validation.FieldError;
+import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+
+import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.net.MalformedURLException;
 import java.nio.file.Files;
@@ -52,18 +55,47 @@ public class ProductController {
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
         }
     }
+
+    @InitBinder
+    protected void initBinder(WebDataBinder  binder) {
+        // Xử lý dữ liệu đầu vào cho Integer: Chuyển "null" hoặc chuỗi rỗng thành null
+        binder.registerCustomEditor(Integer.class, new PropertyEditorSupport() {
+            @Override
+            public void setAsText(String text) {
+                if (text == null || text.trim().equalsIgnoreCase("null") || text.trim().isEmpty()) {
+                    setValue(null);
+                } else {
+                    try {
+                        setValue(Integer.parseInt(text));
+                    } catch (NumberFormatException e) {
+                        setValue(null); // Nếu không phải số hợp lệ, đặt giá trị null
+                    }
+                }
+            }
+        });
+    }
     // thêm mới 1 sản phấm
     @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
-    public ResponseEntity<Messageresponse<Product>> addProduct(@Valid @ModelAttribute ProductDto productDto, BindingResult bindingResult) throws IOException {
+    public ResponseEntity<Messageresponse<Product>> addProduct(@Valid @ModelAttribute ProductDto productDto,
+                                                               BindingResult bindingResult) throws IOException {
         String filename = storeFile(productDto.getAvatarImage());
-        if (bindingResult.hasErrors()) {
 
 
             FieldError fieldError = bindingResult.getFieldError();
-            String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
 
-            Messageresponse<Product> response = new Messageresponse<>(201, message);
-            return ResponseEntity.ok(response);
+
+            if (bindingResult.hasErrors()) {
+                String message = "";
+                // Xử lý lỗi ép kiểu
+                if ((fieldError.getField().equals("quantity") || fieldError.getField().equals("price"))
+                        && fieldError.getDefaultMessage().contains("không được để trống")) {
+                    message = "Giá trị nhập vào sai định dạng";
+                } else {
+                    message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
+                }
+                Messageresponse<Product> response = new Messageresponse<>(201, message);
+                return ResponseEntity.ok(response);
+            
         }
         Product product = productService.createproduct(productDto, filename);
         Messageresponse<Product> response = new Messageresponse<>(200,"Thêm mới sản phẩm thành công", product);
@@ -79,6 +111,14 @@ public class ProductController {
     private String storeFile(MultipartFile file) throws IOException {
         if (file == null || file.getOriginalFilename() == null ) {
             throw new IllegalArgumentException("File or filename must not be null or empty");
+        }
+        // Lấy định dạng file
+        String fileType = file.getContentType();
+        // Danh sách định dạng ảnh hợp lệ
+        List<String> allowedTypes = List.of("image/jpeg", "image/png", "image/jpg", "image/gif");
+        // Kiểm tra nếu định dạng file không hợp lệ
+        if (!allowedTypes.contains(fileType)) {
+            throw new IllegalArgumentException("File không đúng định dạng! Chỉ chấp nhận JPG, PNG, GIF.");
         }
         // Đảm bảo filename không phải null trước khi truyền vào cleanPath
         String filename = StringUtils.cleanPath(Optional.ofNullable(file.getOriginalFilename()).orElse(""));

@@ -18,9 +18,13 @@ public class ProductDto {
     @Min(value = 0, message = "Giá phải là số nguyên dương")
     Integer price;
     String thumbnail;
+    @NotNull(message = "Trạng thái không được để trống")
+
+    Integer status;
     @Min(value = 0, message = "Giá phải là số nguyên dương")
     @NotNull(message = "Số lượng không được để trống")
     Integer quantity;
+    @NotNull(message = "Nhóm sản phẩm không được để trống")
     @JsonProperty("category_id")
     Integer categoryid;
     @NotNull(message = "Ảnh không được để trống")
