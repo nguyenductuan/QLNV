@@ -20,7 +20,6 @@ public class Position {
     @OneToMany(mappedBy = "position")
     @JsonBackReference
     private Set<Employee> employeeList;
-
     @JsonCreator
     public Position(Integer positionid) {
         this.positionId = Math.toIntExact((positionid));

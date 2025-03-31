@@ -32,6 +32,7 @@ public class ProductService {
        Product product= new Product();
        product.setName(productDto.getName());
        product.setCategory(exitcategory);
+       product.setStatus(productDto.getStatus());
        product.setCreatedate(LocalDate.now());
        product.setPrice(productDto.getPrice());
        product.setThumbnail(filename);

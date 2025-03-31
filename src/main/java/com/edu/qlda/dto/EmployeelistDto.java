@@ -4,7 +4,7 @@ public interface EmployeelistDto {
     String getName();
     String getPhone();
     String getEmail();
-    String getStatus();
+    Integer getStatus();
     String getAddress();
     String getCreatedate();
     String getUpdatedate();

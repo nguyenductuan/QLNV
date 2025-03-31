@@ -7,7 +7,7 @@ import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.EmployeeRepository;
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-import org.springframework.data.domain.Pageable;
+
 
 import java.time.LocalDate;
 import java.util.List;
@@ -24,8 +24,8 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<EmployeelistDto> findAllEmployee(Pageable pageable) {
-        return employeeRepository.findAllEmployee(pageable);
+    public List<EmployeelistDto> findAllEmployee() {
+        return employeeRepository.findAllEmployee();
     }
 
     public EmployeelistDto findEmployeeId(int id) {
@@ -57,6 +57,9 @@ public class EmployeeService {
     public void updateemployee(Employee request, Integer id) {
         LocalDate updatedate = LocalDate.now();
         Optional<Employee> employee = employeeRepository.findById(id);
+        if (isEmployeeEmailExist(request.getEmail())) {
+            throw new ValidationException("Nhân viên đã tồn tại trong hệ thống");
+        }
         Employee existingEmployee;
         if (employee.isPresent()) {
             existingEmployee = employee.get();
@@ -74,8 +77,6 @@ public class EmployeeService {
         existingEmployee.setRole(request.getRole());
         existingEmployee.setUpdatedate(updatedate);
         employeeRepository.save(existingEmployee);
-
-
     }
 
     public List<EmployeelistDto> searchEmployee(String name) {

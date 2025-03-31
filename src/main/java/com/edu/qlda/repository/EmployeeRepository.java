@@ -17,7 +17,7 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             "e.address,e.gender,e.phone,e.status,e.birthday,e.createdate,e.updatedate" +
             " from employee e inner join position p on p.position_id =e.position_id inner join role r on e.role_id = r.role_id ",
             nativeQuery = true)
-    List<EmployeelistDto> findAllEmployee(Pageable pageable);
+    List<EmployeelistDto> findAllEmployee();
 
     boolean existsByEmail(String email);
 
