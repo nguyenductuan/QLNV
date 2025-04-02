@@ -7,7 +7,8 @@ import org.springframework.boot.test.context.SpringBootTest;
 class QldaApplicationTests {
 
     @Test
-    void contextLoads() {// test
+    void contextLoads() {
+        //test
     }
 
 }

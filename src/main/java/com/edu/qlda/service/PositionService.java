@@ -12,9 +12,10 @@ import java.util.List;
 @Service
 public class PositionService {
 
-    private PostionRepository postionRepository;
+    private final PostionRepository postionRepository;
 
     public PositionService(PostionRepository postionRepository) {
+
         this.postionRepository = postionRepository;
     }
     public List<Position> listPosition(){

@@ -26,7 +26,7 @@ public class CartController {
 
     public  ResponseEntity<Messageresponse<Void>> addProductToCart(@RequestBody CartrequestDto request) {
         cartService.addProductToCart(request);
-        Messageresponse response = new Messageresponse(200, ACTION_SUCCESS, "");// Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
+        Messageresponse <Void> response = new Messageresponse(200, ACTION_SUCCESS, "");// Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/cart-view") // API để lấy giỏ hàng của người dùng
