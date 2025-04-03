@@ -22,6 +22,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -78,24 +79,33 @@ public class EmployeeController {
         );
     }
 
+    // Phương thức xử lý chung
+
+    private ResponseEntity<Messageresponse<Employee>> handleValidationErrors(BindingResult bindingResult) {
+        if (bindingResult.hasErrors()) {
+            String message = bindingResult.getFieldErrors().stream()
+                    .map(FieldError::getDefaultMessage)
+                    .collect(Collectors.joining(", "));
+            return ResponseEntity.ok(new Messageresponse<>(201, message));
+        }
+        return null;
+    }
+
+    private ResponseEntity<Messageresponse<Employee>> handleException(Exception e) {
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new Messageresponse<>(409, e.getMessage()));
+    }
+
     // Thêm mới cá nhân
     @PostMapping("/addemployee")
     public ResponseEntity<Messageresponse<Employee>> createemployee(@Valid @RequestBody Employee employeeDto, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                FieldError fieldError = bindingResult.getFieldError();
-                String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
-                Messageresponse<Employee> response = new Messageresponse<>(201, message);
-                return ResponseEntity.ok(response);
-            }
+            ResponseEntity<Messageresponse<Employee>> errorResponse = handleValidationErrors(bindingResult);
+            if (errorResponse != null) return errorResponse;
+
             employeeService.createemployee(employeeDto);
-            Messageresponse<Employee> response = new Messageresponse<>(200, ACTIONSUCESS);
-            return ResponseEntity.ok(response);
-        }
-        // Xử lý ngoại lệ các dữ lệu
-        catch (Exception e) {
-            Messageresponse<Employee> response = new Messageresponse<>(409, e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+            return ResponseEntity.ok(new Messageresponse<>(200, "Thêm nhân viên thành công"));
+        } catch (Exception e) {
+            return handleException(e);
         }
     }
 
@@ -103,18 +113,13 @@ public class EmployeeController {
     @PutMapping("/updateemployee/{id}")
     public ResponseEntity<Messageresponse<Employee>> updateemployee(@RequestBody Employee employeeEditDto, @PathVariable Integer id, BindingResult bindingResult) {
         try {
-            if (bindingResult.hasErrors()) {
-                FieldError fieldError = bindingResult.getFieldError();
-                String message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
-                Messageresponse<Employee> response = new Messageresponse<>(201, message);
-                return ResponseEntity.ok(response);
-            }
+            ResponseEntity<Messageresponse<Employee>> errorResponse = handleValidationErrors(bindingResult);
+            if (errorResponse != null) return errorResponse;
             employeeService.updateemployee(employeeEditDto, id);
             Messageresponse<Employee> response = new Messageresponse<>(200, "Cập nhật nhân viên thành công");
             return ResponseEntity.ok(response);
-        } catch (RuntimeException e) {
-            Messageresponse<Employee> response = new Messageresponse<>(409, e.getMessage());
-            return ResponseEntity.status(HttpStatus.CONFLICT).body(response);
+        }catch (Exception e) {
+            return handleException(e);
         }
     }
 
@@ -156,5 +161,11 @@ public class EmployeeController {
                 .headers(headers)
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
+    }
+    // Xóa nhiều cá nhân
+    @DeleteMapping
+    public ResponseEntity<String> deleteEmployees(@RequestBody List<Integer> ids) {
+        employeeService.deleteEmployees(ids);
+        return ResponseEntity.ok("Các nhân viên đã được xóa thành công");
     }
 }

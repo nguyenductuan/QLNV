@@ -28,4 +28,25 @@ public DiscountController(DiscountService discountService) {
      return  discountService.appDiscount(request.getTotalAmount(), request.getSelectedDiscount());
 
     }
+
+    // Thêm mã giảm giá
+    @PostMapping
+    public ResponseEntity<Coupon> createCoupon(@Valid @RequestBody Coupon request) {
+        Coupon coupon = couponService.createCoupon(request);
+        return ResponseEntity.ok(coupon);
+    }
+    // Chi tiết mã giảm giá
+
+    // Xóa mã giảm giá
+    @DeleteMapping("/{id}")
+    public ResponseEntity<String> deleteCoupon(@PathVariable Integer id) {
+        couponService.deleteCoupon(id);
+        return ResponseEntity.ok("Mã giảm giá đã được xóa thành công");
+    }
+    // Xóa nhiều mã giảm giá
+    @DeleteMapping
+    public ResponseEntity<String> deleteCoupons(@RequestBody List<Integer> ids) {
+        couponService.deleteCoupons(ids);
+        return ResponseEntity.ok("Các mã giảm giá đã được xóa thành công");
+    }
 }

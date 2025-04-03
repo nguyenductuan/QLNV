@@ -71,5 +71,5 @@ public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
             "and e.createdate >= :#{#search.startDate} AND e.createdate <=: #{#search.endDate}",
             nativeQuery = true)
     List<EmployeelistDto> searchEmployeesWithDateRange(@Param("search") EmployeesearchDto search);
-
+    long countByIdIn(List<Integer> ids);
 }

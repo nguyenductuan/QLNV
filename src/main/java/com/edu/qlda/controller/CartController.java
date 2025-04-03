@@ -26,7 +26,7 @@ public class CartController {
 
     public  ResponseEntity<Messageresponse<Void>> addProductToCart(@RequestBody CartrequestDto request) {
         cartService.addProductToCart(request);
-        Messageresponse response = new Messageresponse(200, ACTION_SUCCESS, "");// Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
+        Messageresponse <Void> response = new Messageresponse(200, ACTION_SUCCESS, "");// Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
         return ResponseEntity.status(HttpStatus.OK).body(response);
     }
     @GetMapping("/cart-view") // API để lấy giỏ hàng của người dùng
@@ -42,5 +42,11 @@ public class CartController {
     public String deleteCart(@PathVariable Integer id) {
         cartService.deleteproduct(id);
         return ACTION_SUCCESS;
+    }
+    // Xóa nhiều sản phẩm trong giỏ hàng
+    @DeleteMapping
+    public ResponseEntity<String> deleteCartItems(@RequestBody List<Integer> cartItemIds) {
+        cartService.deleteCartItems(cartItemIds);
+        return ResponseEntity.ok("Các sản phẩm đã được xóa khỏi giỏ hàng thành công");
     }
 }

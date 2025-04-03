@@ -28,6 +28,7 @@ import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @RestController
 @CrossOrigin("http://localhost:4200")
@@ -80,23 +81,21 @@ public class ProductController {
                                                                BindingResult bindingResult) throws IOException {
         String filename = storeFile(productDto.getAvatarImage());
 
+        if (bindingResult.hasErrors()) {
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            String message = errors.stream()
+                    .map(error -> {
+                        if (error.getField().equals("quantity") || error.getField().equals("price")) {
+                            return "Giá trị nhập vào sai định dạng";
+                        }
+                        return error.getDefaultMessage();
+                    })
+                    .collect(Collectors.joining(", ")); // Gộp tất cả lỗi thành chuỗi
 
-            FieldError fieldError = bindingResult.getFieldError();
-
-
-            if (bindingResult.hasErrors()) {
-                String message = "";
-                // Xử lý lỗi ép kiểu
-                if ((fieldError.getField().equals("quantity") || fieldError.getField().equals("price"))
-                        && fieldError.getDefaultMessage().contains("không được để trống")) {
-                    message = "Giá trị nhập vào sai định dạng";
-                } else {
-                    message = (fieldError != null) ? fieldError.getDefaultMessage() : "";
-                }
-                Messageresponse<Product> response = new Messageresponse<>(201, message);
-                return ResponseEntity.ok(response);
-            
+            Messageresponse<Product> response = new Messageresponse<>(201, message);
+            return ResponseEntity.ok(response);
         }
+
         Product product = productService.createproduct(productDto, filename);
         Messageresponse<Product> response = new Messageresponse<>(200,"Thêm mới sản phẩm thành công", product);
         return ResponseEntity.ok(response);
@@ -158,5 +157,11 @@ public class ProductController {
         } catch (MalformedURLException e) {
             return ResponseEntity.notFound().build();
         }
+    }
+    // Xóa nhiều sản phẩm
+    @DeleteMapping
+    public ResponseEntity<String> deleteProducts(@RequestBody List<Integer> productIds) {
+        productService.deleteProducts(productIds);
+        return ResponseEntity.ok("Các sản phẩm đã được xóa thành công");
     }
 }
