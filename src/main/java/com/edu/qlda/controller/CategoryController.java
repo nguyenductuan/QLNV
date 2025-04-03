@@ -32,8 +32,8 @@ public class CategoryController {
     }
     // Chỉnh sửa nhóm sản phẩm
     @PostMapping
-    public ResponseEntity<Category> updateCategory(@Valid @RequestBody Category request) {
-        Category category = categoryService.updateCategory(request);
+    public ResponseEntity<Category> updateCategory(@Valid @RequestBody Category request, Integer id) {
+        Category category = categoryService.updateCategory(id,request);
         return ResponseEntity.ok(category);
     }
     // Xem chi tết nhóm sản phẩm
