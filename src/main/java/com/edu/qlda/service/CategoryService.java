@@ -25,7 +25,7 @@ public class CategoryService {
         if (categoryRepository.existsByName(request.getName())) {
             throw new ValidationException(CATEGORY_NOT_FOUND);
         }
-  
+
         return categoryRepository.save(request);
     }
 
