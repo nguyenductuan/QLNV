@@ -37,4 +37,21 @@ public class CartService {
     public void deleteproduct(Integer productId) {
         cartRepository.deleteproduct(productId);
     }
+// Xóa nhiều sản phẩm trong giỏ hàng
+@Transactional
+public void deleteCartItems(List<Integer> cartItemIds) {
+    // Kiểm tra danh sách có rỗng không
+    if (cartItemIds == null || cartItemIds.isEmpty()) {
+        throw new ValidationException("Danh sách sản phẩm trong giỏ hàng cần xóa không được để trống");
+    }
+
+    // Kiểm tra xem có ID nào không tồn tại không
+    long count = cartRepository.countByIdIn(cartItemIds);
+    if (count != cartItemIds.size()) {
+        throw new ValidationException("Một số sản phẩm trong giỏ hàng không tồn tại");
+    }
+
+    // Xóa tất cả sản phẩm khỏi giỏ hàng theo danh sách ID
+    cartRepository.deleteAllById(cartItemIds);
+}
 }

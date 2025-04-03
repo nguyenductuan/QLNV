@@ -162,4 +162,10 @@ public class EmployeeController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
     }
+    // Xóa nhiều cá nhân
+    @DeleteMapping
+    public ResponseEntity<String> deleteEmployees(@RequestBody List<Integer> ids) {
+        employeeService.deleteEmployees(ids);
+        return ResponseEntity.ok("Các nhân viên đã được xóa thành công");
+    }
 }

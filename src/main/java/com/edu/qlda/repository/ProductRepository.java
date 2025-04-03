@@ -17,5 +17,5 @@ public interface ProductRepository extends JpaRepository<Product, Integer> {
             "Select  * from products  WHERE product_id IN :productIds", nativeQuery = true)
 List<Product> findProductsByIds(@Param("productIds") List<Integer> productIds);
 
-
+    long countByIdIn(List<Integer> productIds);
 }

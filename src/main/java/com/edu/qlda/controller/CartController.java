@@ -43,4 +43,10 @@ public class CartController {
         cartService.deleteproduct(id);
         return ACTION_SUCCESS;
     }
+    // Xóa nhiều sản phẩm trong giỏ hàng
+    @DeleteMapping
+    public ResponseEntity<String> deleteCartItems(@RequestBody List<Integer> cartItemIds) {
+        cartService.deleteCartItems(cartItemIds);
+        return ResponseEntity.ok("Các sản phẩm đã được xóa khỏi giỏ hàng thành công");
+    }
 }

@@ -158,4 +158,10 @@ public class ProductController {
             return ResponseEntity.notFound().build();
         }
     }
+    // Xóa nhiều sản phẩm
+    @DeleteMapping
+    public ResponseEntity<String> deleteProducts(@RequestBody List<Integer> productIds) {
+        productService.deleteProducts(productIds);
+        return ResponseEntity.ok("Các sản phẩm đã được xóa thành công");
+    }
 }
