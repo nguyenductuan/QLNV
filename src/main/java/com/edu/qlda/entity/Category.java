@@ -7,6 +7,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.time.LocalDate;
+
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
@@ -18,6 +20,8 @@ public class Category {
     @NotBlank(message = "Tên nhóm sản phẩm không được để trống")
     private Integer categoryId;
     private  String name;
+    private LocalDate createdate;
+    private LocalDate updatedate;
 
     @JsonCreator
     public Category(Integer categoryId) {
