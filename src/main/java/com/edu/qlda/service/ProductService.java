@@ -3,6 +3,7 @@ package com.edu.qlda.service;
 import com.edu.qlda.dto.ProductDto;
 import com.edu.qlda.entity.Category;
 import com.edu.qlda.entity.Product;
+import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.CategoryRepository;
 import com.edu.qlda.repository.ProductRepository;
 import org.springframework.stereotype.Service;
@@ -52,18 +53,14 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 // xóa nhiều sản phẩm
-@Transactional
+
 public void deleteProducts(List<Integer> productIds) {
     // Kiểm tra danh sách có rỗng không
     if (productIds == null || productIds.isEmpty()) {
         throw new ValidationException("Danh sách sản phẩm cần xóa không được để trống");
     }
 
-    // Kiểm tra xem có ID nào không tồn tại không
-    long count = productRepository.countByIdIn(productIds);
-    if (count != productIds.size()) {
-        throw new ValidationException("Một số sản phẩm không tồn tại trong hệ thống");
-    }
+
 
     // Xóa tất cả sản phẩm theo danh sách ID
     productRepository.deleteAllById(productIds);
