@@ -24,7 +24,7 @@ public class QRCodeService {
 
             return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         } catch (WriterException | IOException e) {
-            throw new ValidationException("Error generating QR Code", e);
+            throw new ValidationException("Error generating QR Code");
         }
     }
 
