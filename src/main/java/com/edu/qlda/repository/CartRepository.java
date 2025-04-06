@@ -36,6 +36,5 @@ public interface CartRepository extends JpaRepository<Cart,Integer> {
     );
     @Query(value = "Select cart_id, product_id, quantity, employee_id  From cart where employee_id = ?1 and product_id =?2 ", nativeQuery = true)
     Optional<Cart> findByCartIdAndProductId ( Integer employeeId, Integer productId);
-    Integer countByIdIn(List<Integer> ids);
 }
 
