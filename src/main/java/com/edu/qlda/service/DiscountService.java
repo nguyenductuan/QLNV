@@ -2,16 +2,18 @@ package com.edu.qlda.service;
 
 import com.edu.qlda.entity.Discount;
 import com.edu.qlda.repository.DiscountRepository;
-
 import org.springframework.stereotype.Service;
-
+import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 
 @Service
 public class DiscountService {
 
-    private final DiscountRepository discountRepository;
+    private DiscountRepository discountRepository;
     public DiscountService(DiscountRepository discountRepository) {
+
         this.discountRepository = discountRepository;
     }
     public List<Discount> listDiscount(){
@@ -23,40 +25,45 @@ public class DiscountService {
     }
 
     //...code
-    public Coupon createCoupon(Coupon request) {
-        // Kiểm tra mã giảm giá đã tồn tại chưa
-        if (couponRepository.existsByCode(request.getCode())) {
-            throw new ValidationException("Mã giảm giá đã tồn tại trong hệ thống");
-        }
-
-        // Kiểm tra ngày hợp lệ
-        if (request.getEndDate().isBefore(request.getStartDate())) {
-            throw new ValidationException("Ngày kết thúc phải sau ngày bắt đầu");
-        }
-
-        request.setIsActive(true);  // Mặc định mã giảm giá được kích hoạt
-        return couponRepository.save(request);
+    public boolean isDiscountCodeExist(String code) {
+        return discountRepository.existsByCode(code);
     }
+    public Discount createCoupon(Discount request) {
+        request.setCreateDate(LocalDate.now());
+        request.setIsActive(1);
+        return discountRepository.save(request);
+    }
+    public void updateCoupon(Discount request, Integer id) {
 
-// xóa
-@Transactional
+        Optional<Discount> discount = discountRepository.findById(id);
+        if (discount.isPresent()) {
+
+            Discount existingDiscount = discount.get();
+            existingDiscount.setCode(request.getCode());
+            existingDiscount.setDiscountname(request.getDiscountname());
+            existingDiscount.setDiscountPercentage(request.getDiscountPercentage());
+            existingDiscount.setUpdateDate(LocalDate.now());
+            discountRepository.save(existingDiscount);
+        }
+    }
+// Xóa mã giảm giá
 public void deleteCoupon(Integer id) {
-    // Kiểm tra mã giảm giá có tồn tại không
-    Coupon existingCoupon = couponRepository.findById(id)
-            .orElseThrow(() -> new ValidationException("Mã giảm giá không tồn tại trong hệ thống"));
-
-    // Xóa mã giảm giá
-    couponRepository.delete(existingCoupon);
+discountRepository.deleteById(id);
 }
 // Xóa nhiều mã giảm giá
-@Transactional
-public void deleteCoupons(List<Integer> ids) {
-    // Kiểm tra danh sách có rỗng không
-    if (ids == null || ids.isEmpty()) {
-        throw new ValidationException("Danh sách mã giảm giá cần xóa không được để trống");
+public List<Integer> deleteCoupons(List<Integer> ids) {
+    List<Integer> notFoundIds = new ArrayList<>();
+    for (Integer id : ids) {
+        if (discountRepository.existsById(id)) {
+            discountRepository.deleteById(id);
+        } else {
+            notFoundIds.add(id);
+        }
     }
-
-    // Xóa tất cả mã giảm giá theo danh sách ID
-    couponRepository.deleteAllById(ids);
+    return notFoundIds;
 }
+// lấy thông tin mã giảm giá khi có id
+    public Optional<Discount> getDiscountByID(Integer id){
+         return discountRepository.findById(id);
+    }
 }

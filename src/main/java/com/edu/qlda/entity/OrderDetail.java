@@ -19,6 +19,6 @@ public class OrderDetail {
     @ManyToOne
     @JoinColumn(name = "product_id")
     private Product product;
-    @JoinColumn(name = "number_of_products")
+    @JoinColumn(name = "numberofproducts")
     private Integer numberofproducts;
 }

@@ -10,6 +10,7 @@ import org.springframework.stereotype.Service;
 
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
@@ -95,17 +96,18 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 // Xóa nhiều cá nhân
-public void deleteEmployees(List<Integer> ids) {
-    // Kiểm tra danh sách có rỗng không
-    if (ids == null || ids.isEmpty()) {
-        throw new ValidationException("Danh sách nhân viên cần xóa không được để trống");
+
+    // Xóa nhiều mã giảm giá
+    public List<Integer> deleteEmployees(List<Integer> ids) {
+        List<Integer> notFoundIds = new ArrayList<>();
+        for (Integer id : ids) {
+            if (employeeRepository.existsById(id)) {
+                employeeRepository.deleteById(id);
+            } else {
+                notFoundIds.add(id);
+            }
+        }
+        return notFoundIds;
     }
-    // Kiểm tra xem có ID nào không tồn tại không
-    long count = employeeRepository.countByIdIn(ids);
-    if (count != ids.size()) {
-        throw new ValidationException("Một số nhân viên không tồn tại trong hệ thống");
-    }
-    // Xóa tất cả nhân viên theo danh sách ID
-    employeeRepository.deleteAllById(ids);
-}
+
 }
