@@ -154,9 +154,26 @@ public class EmployeeController {
                 .body(new InputStreamResource(in));
     }
     // Xóa nhiều cá nhân cần sửa
-    @DeleteMapping("delete-employees")
-    public ResponseEntity<String> deleteEmployees(@RequestBody List<Integer> ids) {
-        employeeService.deleteEmployees(ids);
-        return ResponseEntity.ok("Các nhân viên đã được xóa thành công");
+    @PostMapping("delete-employees")
+
+    public ResponseEntity<Messageresponse<List<Integer>>> deleteEmployees(@RequestBody List<Integer> ids) {
+
+        try {
+            // Kiểm tra danh sách có rỗng không
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Danh sách nhân viên cần xóa không được để trống"));
+            }
+            // danh sách mã giảm giá cần xóa
+            List<Integer> notFoundIds = employeeService.deleteEmployees(ids);
+            if (notFoundIds.isEmpty()) {
+                return ResponseEntity.ok(new Messageresponse<>(200, "Danh sách nhân viên đã được xóa thành công"));
+            } else {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Một số nhân viên không tồn tại", notFoundIds));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Messageresponse<>(500, "Lỗi hệ thống:" + e.getMessage()));
+        }
     }
+
+
 }

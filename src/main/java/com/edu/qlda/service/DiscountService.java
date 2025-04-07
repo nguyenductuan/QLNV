@@ -1,11 +1,8 @@
 package com.edu.qlda.service;
 
 import com.edu.qlda.entity.Discount;
-
 import com.edu.qlda.repository.DiscountRepository;
-
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -16,6 +13,7 @@ public class DiscountService {
 
     private DiscountRepository discountRepository;
     public DiscountService(DiscountRepository discountRepository) {
+
         this.discountRepository = discountRepository;
     }
     public List<Discount> listDiscount(){
