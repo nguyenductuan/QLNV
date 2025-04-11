@@ -2,6 +2,7 @@ package com.edu.qlda.controller;
 
 import com.edu.qlda.entity.Category;
 
+
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.CategoryService;
 
@@ -43,9 +44,11 @@ public class CategoryController {
     }
     // Xóa nhóm sản phẩm
     @DeleteMapping("delete-category/{id}")
-    public ResponseEntity<String> deleteCategory(@PathVariable Integer id) {
+    public ResponseEntity<Messageresponse<Category>> deleteCategory(@PathVariable Integer id) {
         categoryService.deleteCategory(id);
-        return ResponseEntity.ok("Nhóm sản phẩm đã được xóa thành công");
+        Messageresponse<Category> response = new Messageresponse<>(200,"Xóa nhóm sản phẩm thành công");
+        return ResponseEntity.ok(response);
+
     }
     // Xóa nhiều nhóm sản phẩm
 
