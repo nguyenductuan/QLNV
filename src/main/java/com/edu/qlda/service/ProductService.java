@@ -3,11 +3,12 @@ package com.edu.qlda.service;
 import com.edu.qlda.dto.ProductDto;
 import com.edu.qlda.entity.Category;
 import com.edu.qlda.entity.Product;
-import com.edu.qlda.exception.ValidationException;
+
 import com.edu.qlda.repository.CategoryRepository;
 import com.edu.qlda.repository.ProductRepository;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.List;
 
 @Service
@@ -53,16 +54,16 @@ public class ProductService {
         productRepository.deleteById(id);
     }
 // xóa nhiều sản phẩm
-
-public void deleteProducts(List<Integer> productIds) {
-    // Kiểm tra danh sách có rỗng không
-    if (productIds == null || productIds.isEmpty()) {
-        throw new ValidationException("Danh sách sản phẩm cần xóa không được để trống");
+    public List<Integer> deleteProducts(List<Integer> ids) {
+        List<Integer> notFoundIds = new ArrayList<>();
+        for (Integer id : ids) {
+            if (productRepository.existsById(id)) {
+                productRepository.deleteById(id);
+            } else {
+                notFoundIds.add(id);
+            }
+        }
+        return notFoundIds;
     }
 
-
-
-    // Xóa tất cả sản phẩm theo danh sách ID
-    productRepository.deleteAllById(productIds);
-}
 }

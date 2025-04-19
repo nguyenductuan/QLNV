@@ -153,7 +153,7 @@ public class EmployeeController {
                 .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
     }
-    // Xóa nhiều cá nhân cần sửa
+    // Xóa nhiều cá nhân
     @PostMapping("delete-employees")
 
     public ResponseEntity<Messageresponse<List<Integer>>> deleteEmployees(@RequestBody List<Integer> ids) {
