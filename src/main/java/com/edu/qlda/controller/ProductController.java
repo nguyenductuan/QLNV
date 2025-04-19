@@ -101,8 +101,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     @PutMapping(value = "/updateproduct/{id}",consumes = "multipart/form-data")
-    public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto, BindingResult bindingResult, @PathVariable Integer id) throws IOException {
-         String filename = storeFile(productDto.getAvatarImage());
+    public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto,
+                                                                  BindingResult bindingResult,
+                                                                  @PathVariable Integer id) throws IOException {
+         String filename = null;
+        // Kiểm tra nếu người dùng có tải lên ảnh mới
+        if (productDto.getAvatarImage() != null && !productDto.getAvatarImage().isEmpty()) {
+            filename = storeFile(productDto.getAvatarImage()); // lưu file mới
+        }
          Product product = productService.updateproduct(productDto, id, filename);
          Messageresponse<Product> response = new Messageresponse<>(202,"Cập nhật sản phẩm thành công",product);
         return ResponseEntity.ok(response);

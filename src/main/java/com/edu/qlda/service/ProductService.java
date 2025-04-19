@@ -45,7 +45,10 @@ public class ProductService {
         Product existingProductOpt = productById(id);
         existingProductOpt.setName(productDto.getName());
         existingProductOpt.setPrice(productDto.getPrice());
-        existingProductOpt.setThumbnail(filename);
+        // Nếu có ảnh thì lưu aảnh mới
+        if (filename != null) {
+            existingProductOpt.setThumbnail(filename);
+        }
         existingProductOpt.setUpdatedate(LocalDate.now());
         existingProductOpt.setQuantity(productDto.getQuantity());
         return productRepository.save(existingProductOpt);
