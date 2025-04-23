@@ -96,8 +96,6 @@ public class EmployeeService {
         return employeeRepository.findAll();
     }
 // Xóa nhiều cá nhân
-
-    // Xóa nhiều mã giảm giá
     public List<Integer> deleteEmployees(List<Integer> ids) {
         List<Integer> notFoundIds = new ArrayList<>();
         for (Integer id : ids) {

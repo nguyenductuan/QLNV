@@ -101,8 +101,14 @@ public class ProductController {
         return ResponseEntity.ok(response);
     }
     @PutMapping(value = "/updateproduct/{id}",consumes = "multipart/form-data")
-    public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto, BindingResult bindingResult, @PathVariable Integer id) throws IOException {
-         String filename = storeFile(productDto.getAvatarImage());
+    public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto,
+                                                                  BindingResult bindingResult,
+                                                                  @PathVariable Integer id) throws IOException {
+         String filename = null;
+        // Kiểm tra nếu người dùng có tải lên ảnh mới
+        if (productDto.getAvatarImage() != null && !productDto.getAvatarImage().isEmpty()) {
+            filename = storeFile(productDto.getAvatarImage()); // lưu file mới
+        }
          Product product = productService.updateproduct(productDto, id, filename);
          Messageresponse<Product> response = new Messageresponse<>(202,"Cập nhật sản phẩm thành công",product);
         return ResponseEntity.ok(response);
@@ -159,9 +165,26 @@ public class ProductController {
         }
     }
     // Xóa nhiều sản phẩm cần xem lại
-    @DeleteMapping("/delete-products/[ids]")
-    public ResponseEntity<String> deleteProducts(@RequestBody List<Integer> productIds) {
-        productService.deleteProducts(productIds);
-        return ResponseEntity.ok("Các sản phẩm đã được xóa thành công");
+
+    @PostMapping("delete-products")
+
+    public ResponseEntity<Messageresponse<List<Integer>>> deleteProducts(@RequestBody List<Integer> ids) {
+
+        try {
+            // Kiểm tra danh sách có rỗng không
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Danh sách nhân viên cần xóa không được để trống"));
+            }
+            // danh sách mã giảm giá cần xóa
+            List<Integer> notFoundIds = productService.deleteProducts(ids);
+            if (notFoundIds.isEmpty()) {
+                return ResponseEntity.ok(new Messageresponse<>(200, "Danh sách nhân viên đã được xóa thành công"));
+            } else {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Một số nhân viên không tồn tại", notFoundIds));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Messageresponse<>(500, "Lỗi hệ thống:" + e.getMessage()));
+        }
     }
+
 }

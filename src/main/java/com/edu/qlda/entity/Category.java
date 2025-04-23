@@ -22,6 +22,7 @@ public class Category {
     private  String name;
     private LocalDate createdate;
     private LocalDate updatedate;
+    private Integer status;
 
     @JsonCreator
     public Category(Integer categoryId) {
