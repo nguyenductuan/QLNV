@@ -30,6 +30,9 @@ public  OrderService(OrderRepository orderRepository, ProductRepository productR
     this.productRepository = productRepository;
     this.orderDetailRepository = orderDetailRepository;
 }
+public List<Orders> listOrder (){
+return  orderRepository.findAll();
+}
     public Orders createOrder(OrderDto orderDto) {
         Orders orders = new Orders();
         orders.setAddress(orderDto.getAddress());
@@ -41,7 +44,7 @@ public  OrderService(OrderRepository orderRepository, ProductRepository productR
         orders.setPhone(orderDto.getPhone());
         orders.setEmail(orderDto.getEmail());
         orders.setTotalAmount(orderDto.getTotalAmount());
-        orders.setPaymentStatus("Pending");
+        orders.setPaymentStatus("Đang xử lý");
         orderRepository.save(orders);
         // Tạo danh sách các đối tượng OrderDetail từ CartItem
         List<OrderDetail> orderDetails = new ArrayList<>();
