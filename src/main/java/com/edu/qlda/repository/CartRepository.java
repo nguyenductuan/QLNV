@@ -8,11 +8,12 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.data.repository.query.Param;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Optional;
 
 public interface CartRepository extends JpaRepository<Cart,Integer> {
-    @Query(value = "Select  c.cart_id, c.quantity,p.name, p.price, p.product_id,c.employee_id " +
+    @Query(value = "Select  c.cart_id, c.quantity,p.name, p.price, p.product_id,c.employee_id, c.createdate " +
             "FROM products p inner join cart c on p.product_id = c.product_id " +
             "inner join employee e on c.employee_id = e.employee_id" +
             " WHERE c.employee_id=?", nativeQuery = true)
@@ -27,14 +28,14 @@ public interface CartRepository extends JpaRepository<Cart,Integer> {
     void deleteproduct(Integer productId);
     @Transactional
     @Modifying
-    @Query(value = "INSERT INTO `cart` (`employee_id`,`product_id`,`quantity`) VALUES (:employee_id,:product_id,:quantity)", nativeQuery = true)
+    @Query(value = "INSERT INTO cart (`employee_id`,`product_id`,`quantity`,`createdate`) VALUES (:employeeId,:productId,:quantity,:createdate)", nativeQuery = true)
     void  savecart(
-            @Param("employee_id") Integer employeeId,
-            @Param("product_id") Integer productId,
-              @Param("quantity") Integer quantity
-
-    );
-    @Query(value = "Select cart_id, product_id, quantity, employee_id  From cart where employee_id = ?1 and product_id =?2 ", nativeQuery = true)
+            @Param("employeeId") Integer employeeId,
+            @Param("productId") Integer productId,
+              @Param("quantity") Integer quantity,
+            @Param("createdate") LocalDate createdate
+            );
+    @Query(value = "Select * from cart where employee_id = ?1 and product_id =?2 ", nativeQuery = true)
     Optional<Cart> findByCartIdAndProductId ( Integer employeeId, Integer productId);
 }
 

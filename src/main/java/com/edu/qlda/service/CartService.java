@@ -6,6 +6,7 @@ import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.CartRepository;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -18,15 +19,19 @@ public class CartService {
         this.cartRepository = cartRepository;
     }
     public void addProductToCart(CartrequestDto request) {
+        LocalDate createdate = LocalDate.now();
+
         //Kiểm tra sản pẩm có trong giỏ hang
         Optional<Cart> cartItemOpt = cartRepository.findByCartIdAndProductId(request.getEmployeeId(), request.getProductId());
+
         if (cartItemOpt.isPresent()) {
             //Nếu sản phẩm có trong giorhangf thì tăng số lượng
             int quantity2 = cartItemOpt.get().getQuantity() + request.getQuantity();
             cartRepository.updatecart(quantity2, request.getEmployeeId(), request.getProductId());
         } else {
             //Nếu sản phẩm không có giỏ hàng thì thêm mới
-            cartRepository.savecart(request.getEmployeeId(), request.getProductId(), request.getQuantity());
+
+            cartRepository.savecart(request.getEmployeeId(), request.getProductId(), request.getQuantity(),createdate);
         }
     }
     public void updateCart(Integer quantity, Integer employeeId, Integer productId) {
