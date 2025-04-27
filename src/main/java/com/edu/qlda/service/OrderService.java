@@ -10,6 +10,9 @@ import com.edu.qlda.repository.OrderRepository;
 import com.edu.qlda.repository.ProductRepository;
 
 import org.springframework.stereotype.Service;
+
+import java.sql.Date;
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -30,6 +33,9 @@ public  OrderService(OrderRepository orderRepository, ProductRepository productR
     public Orders createOrder(OrderDto orderDto) {
         Orders orders = new Orders();
         orders.setAddress(orderDto.getAddress());
+        // lưu giá trị date
+        Date today = Date.valueOf(LocalDate.now());
+        orders.setCreatedate(today);
         orders.setName(orderDto.getName());
         orders.setUserId(orderDto.getUserId());
         orders.setPhone(orderDto.getPhone());
