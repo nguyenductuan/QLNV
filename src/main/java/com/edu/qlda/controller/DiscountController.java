@@ -27,6 +27,7 @@ public class DiscountController {
     public DiscountController(DiscountService discountService) {
         this.discountService = discountService;
     }
+
     // Phương thức xử lý chung
     private ResponseEntity<Messageresponse<Discount>> handleValidationErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
@@ -37,6 +38,7 @@ public class DiscountController {
         }
         return null;
     }
+
     @GetMapping("/discount")
     public List<Discount> getAllDiscount() {
         return discountService.listDiscount();
@@ -47,12 +49,14 @@ public class DiscountController {
         return discountService.appDiscount(request.getTotalAmount(), request.getSelectedDiscount());
 
     }
+
     private ResponseEntity<Messageresponse<Discount>> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new Messageresponse<>(409, e.getMessage()));
     }
+
     // Thêm mã giảm giá
     @PostMapping("/creatediscount")
-    public ResponseEntity<Messageresponse<Discount>> createCoupon(@Valid @RequestBody Discount request ,
+    public ResponseEntity<Messageresponse<Discount>> createCoupon(@Valid @RequestBody Discount request,
                                                                   BindingResult bindingResult) {
         try {
             ResponseEntity<Messageresponse<Discount>> errorResponse = handleValidationErrors(bindingResult);
@@ -60,16 +64,16 @@ public class DiscountController {
                 return errorResponse;
             discountService.createCoupon(request);
             return ResponseEntity.ok(new Messageresponse<>(200, "Thêm mới mã giảm giá thành công"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return handleException(e);
         }
 
     }
-   // Cập nhật mã giảm giá
+
+    // Cập nhật mã giảm giá
     @PutMapping("/updatediscount/{id}")
-    public ResponseEntity<Messageresponse<Discount>> updatediscount(@Valid @RequestBody Discount request ,
-                                                                    BindingResult bindingResult,@PathVariable Integer id) {
+    public ResponseEntity<Messageresponse<Discount>> updatediscount(@Valid @RequestBody Discount request,
+                                                                    BindingResult bindingResult, @PathVariable Integer id) {
         try {
             ResponseEntity<Messageresponse<Discount>> errorResponse = handleValidationErrors(bindingResult);
             if (errorResponse != null) return errorResponse;
@@ -80,8 +84,7 @@ public class DiscountController {
             }
             discountService.updateCoupon(request, id);
             return ResponseEntity.ok(new Messageresponse<>(200, "Cập nhật mã giảm giá thành công"));
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             return handleException(e);
         }
 
@@ -89,17 +92,17 @@ public class DiscountController {
 
     @DeleteMapping("delete-discount/")
     public ResponseEntity<Messageresponse<List<Integer>>> missingIds() {
-        return  ResponseEntity.badRequest().body(new Messageresponse<>(400, "Phải truyền ID để xóa"));
+        return ResponseEntity.badRequest().body(new Messageresponse<>(400, "Phải truyền ID để xóa"));
     }
+
     // Xóa mã giảm giá
     @DeleteMapping("delete-discount/{id}")
     public ResponseEntity<Messageresponse<String>> deleteCoupon(@PathVariable Integer id) {
         try {
             Optional<Discount> existingCoupon = discountService.getDiscountByID(id);
-            if (id == null || existingCoupon.isEmpty() ){
+            if (id == null || existingCoupon.isEmpty()) {
                 return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Mã giảm giá không tồn tại trong hệ thống"));
-            }
-            else {
+            } else {
                 discountService.deleteCoupon(id);
                 return ResponseEntity.status(HttpStatus.CREATED).body(new Messageresponse<>(200, "Xóa mã giảm giá thành công"));
             }
@@ -107,6 +110,7 @@ public class DiscountController {
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Messageresponse<>(500, "Lỗi hệ thống:" + e.getMessage()));
         }
     }
+
     // Xóa nhiều mã giảm giá
     @DeleteMapping("delete-discounts")
     public ResponseEntity<Messageresponse<List<Integer>>> deleteCoupons(@RequestBody List<Integer> ids) {

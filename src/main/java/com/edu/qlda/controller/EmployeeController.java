@@ -46,6 +46,7 @@ public class EmployeeController {
         this.roleService = roleService;
         this.excelService = excelService;
     }
+
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
     @GetMapping("/employee")
     public List<EmployeelistDto> getAllEmployees() {
@@ -84,7 +85,6 @@ public class EmployeeController {
         return employeeService.searchadvance(employeesearchDto
         );
     }
-
 
     // Thêm mới cá nhân
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
@@ -196,6 +196,7 @@ public class EmployeeController {
         }
         return null;
     }
+
     private ResponseEntity<Messageresponse<Employee>> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new Messageresponse<>(409, e.getMessage()));
     }
