@@ -1,6 +1,6 @@
 package com.edu.qlda.controller;
-import com.edu.qlda.dto.ProductDto;
 
+import com.edu.qlda.dto.ProductDto;
 
 
 import com.edu.qlda.entity.Product;
@@ -34,18 +34,22 @@ import java.util.stream.Collectors;
 @CrossOrigin("http://localhost:4200")
 public class ProductController {
     private final ProductService productService;
+
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
+
     @GetMapping("/product")
     public List<Product> getAllProducts() {
         return productService.listproducts();
     }
+
     // Xem chi tiết sản phẩm
     @GetMapping("/productid")
     public Product productById(int productId) {
         return productService.productById(productId);
     }
+
     @GetMapping("/productIds")
     public ResponseEntity<List<Product>> productByIds(@RequestParam("ids") String ids) {
         try {
@@ -58,7 +62,7 @@ public class ProductController {
     }
 
     @InitBinder
-    protected void initBinder(WebDataBinder  binder) {
+    protected void initBinder(WebDataBinder binder) {
         // Xử lý dữ liệu đầu vào cho Integer: Chuyển "null" hoặc chuỗi rỗng thành null
         binder.registerCustomEditor(Integer.class, new PropertyEditorSupport() {
             @Override
@@ -75,6 +79,7 @@ public class ProductController {
             }
         });
     }
+
     // thêm mới 1 sản phấm
     @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
     public ResponseEntity<Messageresponse<Product>> addProduct(@Valid @ModelAttribute ProductDto productDto,
@@ -97,24 +102,26 @@ public class ProductController {
         }
 
         Product product = productService.createproduct(productDto, filename);
-        Messageresponse<Product> response = new Messageresponse<>(200,"Thêm mới sản phẩm thành công", product);
+        Messageresponse<Product> response = new Messageresponse<>(200, "Thêm mới sản phẩm thành công", product);
         return ResponseEntity.ok(response);
     }
-    @PutMapping(value = "/updateproduct/{id}",consumes = "multipart/form-data")
+
+    @PutMapping(value = "/updateproduct/{id}", consumes = "multipart/form-data")
     public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto,
                                                                   BindingResult bindingResult,
                                                                   @PathVariable Integer id) throws IOException {
-         String filename = null;
+        String filename = null;
         // Kiểm tra nếu người dùng có tải lên ảnh mới
         if (productDto.getAvatarImage() != null && !productDto.getAvatarImage().isEmpty()) {
             filename = storeFile(productDto.getAvatarImage()); // lưu file mới
         }
-         Product product = productService.updateproduct(productDto, id, filename);
-         Messageresponse<Product> response = new Messageresponse<>(202,"Cập nhật sản phẩm thành công",product);
+        Product product = productService.updateproduct(productDto, id, filename);
+        Messageresponse<Product> response = new Messageresponse<>(202, "Cập nhật sản phẩm thành công", product);
         return ResponseEntity.ok(response);
     }
+
     private String storeFile(MultipartFile file) throws IOException {
-        if (file == null || file.getOriginalFilename() == null ) {
+        if (file == null || file.getOriginalFilename() == null) {
             throw new IllegalArgumentException("File or filename must not be null or empty");
         }
         // Lấy định dạng file
@@ -141,13 +148,15 @@ public class ProductController {
         Files.copy(file.getInputStream(), discus, StandardCopyOption.REPLACE_EXISTING);
         return uniqdnamefile;
     }
+
     //Xóa sản phẩm
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<Messageresponse<Product>> deleteProduct(@PathVariable("id") Integer productId) {
         productService.deleteproduct(productId);
-        Messageresponse<Product> response = new Messageresponse<>(200,"Xóa sản phẩm thành công");
+        Messageresponse<Product> response = new Messageresponse<>(200, "Xóa sản phẩm thành công");
         return ResponseEntity.ok(response);
     }
+
     //Hàm xem thông tin ảnh
     @GetMapping("/product/images/{imagename}")
     public ResponseEntity<Resource> getProductImages(@PathVariable("imagename") String imagename) {
