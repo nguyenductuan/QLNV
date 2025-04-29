@@ -26,13 +26,14 @@ public class CartController {
 
     @PostMapping("cart/add-product")
     public ResponseEntity<Messageresponse<Void>> addProductToCart(@RequestBody CartrequestDto request) {
+
+
         cartService.addProductToCart(request);
         return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS));
     }
 
     @GetMapping("/cart-view") // API để lấy giỏ hàng của người dùng
     public ResponseEntity<Messageresponse<List<Cart>>> getCart(Integer employeeId) {
-
         List<Cart> cartItems = cartService.getCart(employeeId);
         return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS, cartItems));
     }

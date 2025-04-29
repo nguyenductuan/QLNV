@@ -19,7 +19,6 @@ public class CartService {
     }
     public void addProductToCart(CartrequestDto request) {
         LocalDate createdate = LocalDate.now();
-
         //Kiểm tra sản pẩm có trong giỏ hang
         Optional<Cart> cartItemOpt = cartRepository.findByCartIdAndProductId(request.getEmployeeId(), request.getProductId());
 
