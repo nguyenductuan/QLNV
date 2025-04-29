@@ -1,5 +1,4 @@
 package com.edu.qlda.service;
-
 import com.edu.qlda.dto.CartItem;
 import com.edu.qlda.dto.OrderDto;
 import com.edu.qlda.entity.OrderDetail;
@@ -8,9 +7,7 @@ import com.edu.qlda.entity.Product;
 import com.edu.qlda.repository.OrderDetailRepository;
 import com.edu.qlda.repository.OrderRepository;
 import com.edu.qlda.repository.ProductRepository;
-
 import org.springframework.stereotype.Service;
-
 import java.sql.Date;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -20,11 +17,8 @@ import java.util.List;
 public class OrderService {
 
    private final OrderRepository orderRepository;
-
     private final ProductRepository productRepository;
-
     private final OrderDetailRepository orderDetailRepository;
-
 public  OrderService(OrderRepository orderRepository, ProductRepository productRepository, OrderDetailRepository orderDetailRepository) {
     this.orderRepository = orderRepository;
     this.productRepository = productRepository;

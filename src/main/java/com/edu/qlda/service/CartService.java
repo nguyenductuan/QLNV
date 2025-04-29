@@ -5,7 +5,6 @@ import com.edu.qlda.entity.Cart;
 import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.CartRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
@@ -30,7 +29,6 @@ public class CartService {
             cartRepository.updatecart(quantity2, request.getEmployeeId(), request.getProductId());
         } else {
             //Nếu sản phẩm không có giỏ hàng thì thêm mới
-
             cartRepository.savecart(request.getEmployeeId(), request.getProductId(), request.getQuantity(),createdate);
         }
     }
@@ -50,7 +48,6 @@ public class CartService {
     if (cartItemIds == null || cartItemIds.isEmpty()) {
         throw new ValidationException("Danh sách sản phẩm trong giỏ hàng cần xóa không được để trống");
     }
-
     // Xóa tất cả sản phẩm khỏi giỏ hàng theo danh sách ID
     cartRepository.deleteAllById(cartItemIds);
 }
