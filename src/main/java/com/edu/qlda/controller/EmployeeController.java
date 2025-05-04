@@ -50,6 +50,7 @@ public class EmployeeController {
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
     @GetMapping("/employee")
     public List<EmployeelistDto> getAllEmployees() {
+
         return employeeService.findAllEmployee();
     }
 
@@ -145,7 +146,6 @@ public class EmployeeController {
             return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
-
     //Xuất Excel
     @GetMapping("employee/export-excel")
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
