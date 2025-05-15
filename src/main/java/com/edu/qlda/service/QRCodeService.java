@@ -14,18 +14,19 @@ import java.util.Base64;
 
 @Service
 public class QRCodeService {
-    public String generateQRCode(String text, int width, int height) {
+
+    public String generateQRCode(String content, int width, int height) {
         try {
-            QRCodeWriter qrCodeWriter = new QRCodeWriter();
-            BitMatrix bitMatrix = qrCodeWriter.encode(text, BarcodeFormat.QR_CODE, width, height);
+            QRCodeWriter qrWriter = new QRCodeWriter();
+            BitMatrix bitMatrix = qrWriter.encode(content, BarcodeFormat.QR_CODE, width, height);
 
-            ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
-            MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+            try (ByteArrayOutputStream outputStream = new ByteArrayOutputStream()) {
+                MatrixToImageWriter.writeToStream(bitMatrix, "PNG", outputStream);
+                return Base64.getEncoder().encodeToString(outputStream.toByteArray());
+            }
 
-            return Base64.getEncoder().encodeToString(outputStream.toByteArray());
         } catch (WriterException | IOException e) {
-            throw new ValidationException("Error generating QR Code");
+            throw new ValidationException("Lỗi khi tạo mã QR: " + e.getMessage());
         }
     }
-
 }

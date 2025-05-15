@@ -1,13 +1,13 @@
 package com.edu.qlda.service;
 
-import com.edu.qlda.dto.*;
+import com.edu.qlda.dto.EmployeelistDto;
+import com.edu.qlda.dto.EmployeesearchDto;
 import com.edu.qlda.entity.Employee;
 import com.edu.qlda.exception.ValidationException;
-
 import com.edu.qlda.repository.EmployeeRepository;
+
 import jakarta.validation.Valid;
 import org.springframework.stereotype.Service;
-
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -25,20 +25,32 @@ public class EmployeeService {
         this.employeeRepository = employeeRepository;
     }
 
-    public List<EmployeelistDto> findAllEmployee() {
+    public List<EmployeelistDto> getAllEmployees() {
         return employeeRepository.findAllEmployee();
     }
 
-    public EmployeelistDto findEmployeeId(int id) {
+    public EmployeelistDto getEmployeeById(int id) {
         return employeeRepository.findByID(id);
     }
 
-    public void deleteemployee(Integer id) {
-        employeeRepository.deleteemployee(id);
+    public List<Employee> getAllEmployeeEntities() {
+        return employeeRepository.findAll();
     }
 
-    public Employee isUserValid(String email, String password) {
-        Employee user = getAccountByname(email);
+    public List<EmployeelistDto> searchEmployeeByName(String name) {
+        return employeeRepository.searchemployee(name);
+    }
+
+    public List<EmployeelistDto> advancedSearchEmployees(EmployeesearchDto search) {
+        return employeeRepository.searchEmployeesWithDateRange(search);
+    }
+
+    public Employee getAccountByEmail(String email) {
+        return employeeRepository.findByName(email);
+    }
+
+    public Employee validateUser(String email, String password) {
+        Employee user = getAccountByEmail(email);
         if (user != null && matches(password, user.getPassword())) {
             return user;
         }
@@ -48,26 +60,24 @@ public class EmployeeService {
     public boolean isEmployeeEmailExist(String email) {
         return employeeRepository.existsByEmail(email);
     }
-    public void createemployee(@Valid Employee request) {
+
+    public void createEmployee(@Valid Employee request) {
         if (isEmployeeEmailExist(request.getEmail())) {
             throw new ValidationException("Nhân viên đã tồn tại trong hệ thống");
         }
         request.setCreatedate(LocalDate.now());
         employeeRepository.save(request);
     }
-    public void updateemployee(Employee request, Integer id) {
-        LocalDate updatedate = LocalDate.now();
-        Optional<Employee> employee = employeeRepository.findById(id);
-        if (isEmployeeEmailExist(request.getEmail())) {
-            throw new ValidationException("Nhân viên đã tồn tại trong hệ thống");
+
+    public void updateEmployee(Employee request, Integer id) {
+        Employee existingEmployee = employeeRepository.findById(id)
+                .orElseThrow(() -> new ValidationException("Nhân viên không tồn tại trong hệ thống"));
+
+        boolean isEmailChanged = !existingEmployee.getEmail().equals(request.getEmail());
+        if (isEmailChanged && isEmployeeEmailExist(request.getEmail())) {
+            throw new ValidationException("Email đã được sử dụng bởi nhân viên khác");
         }
-        Employee existingEmployee;
-        if (employee.isPresent()) {
-            existingEmployee = employee.get();
-            // Tiếp tục xử lý product
-        } else {
-            throw new ValidationException("Nhân viên không tồn tại trong hệ thống");
-        }
+
         existingEmployee.setName(request.getName());
         existingEmployee.setPhone(request.getPhone());
         existingEmployee.setEmail(request.getEmail());
@@ -76,26 +86,15 @@ public class EmployeeService {
         existingEmployee.setGender(request.getGender());
         existingEmployee.setPosition(request.getPosition());
         existingEmployee.setRole(request.getRole());
-        existingEmployee.setUpdatedate(updatedate);
+        existingEmployee.setUpdatedate(LocalDate.now());
+
         employeeRepository.save(existingEmployee);
     }
 
-    public List<EmployeelistDto> searchEmployee(String name) {
-
-        return employeeRepository.searchemployee(name);
+    public void deleteEmployee(Integer id) {
+        employeeRepository.deleteemployee(id);
     }
 
-    public Employee getAccountByname(String email) {
-        return employeeRepository.findByName(email);
-    }
-
-    public List<EmployeelistDto> searchadvance(EmployeesearchDto search) {
-        return employeeRepository.searchEmployeesWithDateRange(search);
-    }
-    public List<Employee> listemployee() {
-        return employeeRepository.findAll();
-    }
-// Xóa nhiều cá nhân
     public List<Integer> deleteEmployees(List<Integer> ids) {
         List<Integer> notFoundIds = new ArrayList<>();
         for (Integer id : ids) {
@@ -108,4 +107,9 @@ public class EmployeeService {
         return notFoundIds;
     }
 
+    //login
+    public boolean validateUsers(String username, String password) {
+        // Tạm thời hardcoded. Thực tế nên kiểm tra với DB
+        return "admin".equals(username) && "123456".equals(password);
+    }
 }

@@ -1,11 +1,28 @@
 package com.edu.qlda.dto;
 
+/**
+ * Data Transfer Object (DTO) for Cart.
+ * Represents an item in the shopping cart.
+ */
 public class CartDto {
+
     private String productId;
     private Integer cartId;
     private Integer quantity;
     private Integer employeeId;
 
+    // Constructors
+    public CartDto() {
+    }
+
+    public CartDto(String productId, Integer cartId, Integer quantity, Integer employeeId) {
+        this.productId = productId;
+        this.cartId = cartId;
+        this.quantity = quantity;
+        this.employeeId = employeeId;
+    }
+
+    // Getters and Setters
     public String getProductId() {
         return productId;
     }
@@ -22,6 +39,14 @@ public class CartDto {
         this.cartId = cartId;
     }
 
+    public Integer getQuantity() {
+        return quantity;
+    }
+
+    public void setQuantity(Integer quantity) {
+        this.quantity = quantity;
+    }
+
     public Integer getEmployeeId() {
         return employeeId;
     }
@@ -30,11 +55,14 @@ public class CartDto {
         this.employeeId = employeeId;
     }
 
-    public Integer getQuantity() {
-        return quantity;
-    }
-
-    public void setQuantity(Integer quantity) {
-        this.quantity = quantity;
+    // Optional: toString() for logging/debugging
+    @Override
+    public String toString() {
+        return "CartDto{" +
+                "productId='" + productId + '\'' +
+                ", cartId=" + cartId +
+                ", quantity=" + quantity +
+                ", employeeId=" + employeeId +
+                '}';
     }
 }
