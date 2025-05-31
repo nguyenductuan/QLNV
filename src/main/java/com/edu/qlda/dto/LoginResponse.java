@@ -1,40 +1,38 @@
 package com.edu.qlda.dto;
 
+import com.edu.qlda.entity.Employee;
 import lombok.Data;
 
-import java.util.List;
 
 @Data
 public class LoginResponse {
     private String token;
+    private  String message;
+    private Employee employee;
 
-    public LoginResponse(String token) {
-        this.token = token;
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 
     public String getToken() {
         return token;
     }
-//    private String status;
-//    private String message;
-//    private AuthData data;
-//
-//    @Data
-//    public static class AuthData {
-//        private String accessToken;
-//        private String refreshToken;
-//        private long expiresIn;
-//        private String tokenType;
-//        private UserInfo user;
-//    }
-//
-//    @Data
-//    public static class UserInfo {
-//        private Long id;
-//        private String username;
-//        private String email;
-//        private String fullName;
-//        private List<String> roles;
-//        private String avatarUrl;
-//    }
+
+    public void setToken(String token) {
+        this.token = token;
+    }
+
+    public Employee getEmployee() {
+        return employee;
+    }
+
+    public void setEmployee(Employee employee) {
+        this.employee = employee;
+    }
+
+
 }

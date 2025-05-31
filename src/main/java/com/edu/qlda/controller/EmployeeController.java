@@ -81,7 +81,6 @@ public class EmployeeController {
     public List<EmployeelistDto> searchEmployeesAdvanced(@RequestBody EmployeesearchDto dto) {
         return employeeService.advancedSearchEmployees(dto);
     }
-
     @PostMapping("/employee")
     @Operation(summary = "Thêm mới nhân viên")
     public ResponseEntity<Messageresponse<Employee>> createEmployee(@Valid @RequestBody Employee employee,
@@ -96,7 +95,6 @@ public class EmployeeController {
             return handleException(e);
         }
     }
-
     @PutMapping("/employee/{id}")
     @Operation(summary = "Cập nhật thông tin nhân viên")
     public ResponseEntity<Messageresponse<Employee>> updateEmployee(@Valid @RequestBody Employee employee,
@@ -112,7 +110,6 @@ public class EmployeeController {
             return handleException(e);
         }
     }
-
     @DeleteMapping("/employee/{id}")
     @Operation(summary = "Xóa nhân viên theo ID")
     public void deleteEmployee(@PathVariable Integer id) {
@@ -140,18 +137,6 @@ public class EmployeeController {
                     .body(new Messageresponse<>(500, "Lỗi hệ thống: " + e.getMessage()));
         }
     }
-
-//    @PostMapping("/login")
-//    @Operation(summary = "Đăng nhập hệ thống")
-//    public ResponseEntity<Messageresponse<?>> login(@RequestBody Loginrequest request) {
-//        Employee employee = employeeService.isUserValid(request.getEmail(), request.getPassword());
-//        if (employee != null) {
-//            return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS, new Employee[]{employee}));
-//        } else {
-//            return ResponseEntity.ok(new Messageresponse<>(400, "Tài khoản không tồn tại", ""));
-//        }
-//    }
-
     @GetMapping("/employee/export-excel")
     @Operation(summary = "Xuất danh sách nhân viên ra Excel")
     public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {

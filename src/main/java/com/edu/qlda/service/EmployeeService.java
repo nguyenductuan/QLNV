@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 import static java.util.regex.Pattern.matches;
 
@@ -45,8 +44,8 @@ public class EmployeeService {
         return employeeRepository.searchEmployeesWithDateRange(search);
     }
 
-    public Employee getAccountByEmail(String email) {
-        return employeeRepository.findByName(email);
+    public Employee getAccountByEmail(String username) {
+        return employeeRepository.findByName(username);
     }
 
     public Employee validateUser(String email, String password) {
@@ -109,7 +108,9 @@ public class EmployeeService {
 
     //login
     public boolean validateUsers(String username, String password) {
-        // Tạm thời hardcoded. Thực tế nên kiểm tra với DB
-        return "admin".equals(username) && "123456".equals(password);
+        Employee user = getAccountByEmail(username);
+        return user != null && matches(password, user.getPassword());
+
+
     }
 }
