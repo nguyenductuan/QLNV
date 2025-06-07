@@ -29,8 +29,8 @@ public class CartController {
         return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS));
     }
 
-    @GetMapping("/view")
-    public ResponseEntity<Messageresponse<List<Cart>>> getCart(@RequestParam Integer employeeId) {
+    @GetMapping("/view/{employeeId}")
+    public ResponseEntity<Messageresponse<List<Cart>>> getCart(@PathVariable Integer employeeId) {
         List<Cart> cartItems = cartService.getCart(employeeId);
         return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS, cartItems));
     }
