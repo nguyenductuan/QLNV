@@ -12,7 +12,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
-import org.springframework.validation.FieldError;
+
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -39,14 +39,13 @@ public class ProductController {
     public List<Product> getAllProducts() {
         return productService.listProducts();
     }
-
     @GetMapping("/{productId}")
     public Product getProductById(@PathVariable int productId) {
         return productService.getProductById(productId);
     }
 
-    @GetMapping("/by-ids")
-    public ResponseEntity<List<Product>> getProductsByIds(@RequestParam("ids") String ids) {
+    @GetMapping("/by-ids/{ids}")
+    public ResponseEntity<List<Product>> getProductsByIds(@PathVariable String ids) {
         try {
             List<Integer> productIds = Arrays.stream(ids.split(",")).map(Integer::parseInt).toList();
             return ResponseEntity.ok(productService.findProductsByIds(productIds));
@@ -117,15 +116,25 @@ public class ProductController {
     }
 
     @GetMapping("/images/{imagename}")
-    public ResponseEntity<Resource> getProductImage(@PathVariable String imagename) {
+    public ResponseEntity<Object> getProductImage(@PathVariable String imagename) {
         try {
             Path imagePath = Paths.get("uploads", imagename);
             Resource resource = new UrlResource(imagePath.toUri());
-            return resource.exists()
-                    ? ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(resource)
-                    : ResponseEntity.notFound().build();
+            if (!resource.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Image not found: " + imagename);
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(resource);
+
         } catch (MalformedURLException e) {
-            return ResponseEntity.notFound().build();
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid image URL: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching image: " + e.getMessage());
         }
     }
 
