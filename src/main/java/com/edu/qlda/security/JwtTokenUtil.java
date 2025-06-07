@@ -15,7 +15,8 @@ public class JwtTokenUtil {
                 .cors(cors -> {}) // ✅ Không cần gọi .and() nữa
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/login").permitAll() // ✅ Cho phép truy cập login không cần auth
-                        .anyRequest().authenticated() // Các request khác phải đăng nhập
+                     //  .anyRequest().authenticated() // Các request khác phải đăng nhập
+                        .anyRequest().permitAll() // Cho phép mọi request
                 );
         return http.build();
     }
