@@ -26,7 +26,7 @@ public interface CartRepository extends JpaRepository<Cart,Integer> {
     @Modifying
     @Query(value = "DELETE FROM cart where product_id = ?", nativeQuery = true)
     void deleteproduct(Integer productId);
-
+    @Transactional
     @Modifying
     @Query(value = "INSERT INTO cart (`employee_id`,`product_id`,`quantity`,`createdate`) VALUES (:employeeId,:productId,:quantity,:createdate)", nativeQuery = true)
     void  savecart(
