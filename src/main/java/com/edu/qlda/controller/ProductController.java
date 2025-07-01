@@ -1,8 +1,6 @@
 package com.edu.qlda.controller;
 
 import com.edu.qlda.dto.ProductDto;
-
-
 import com.edu.qlda.entity.Product;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.ProductService;
@@ -15,7 +13,6 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 
-import org.springframework.validation.FieldError;
 import org.springframework.web.bind.WebDataBinder;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
@@ -23,177 +20,136 @@ import org.springframework.web.multipart.MultipartFile;
 import java.beans.PropertyEditorSupport;
 import java.io.IOException;
 import java.net.MalformedURLException;
-import java.nio.file.Files;
-import java.nio.file.Path;
-import java.nio.file.Paths;
-import java.nio.file.StandardCopyOption;
+import java.nio.file.*;
 import java.util.*;
 import java.util.stream.Collectors;
 
 @RestController
+@RequestMapping("/products")
 @CrossOrigin("http://localhost:4200")
 public class ProductController {
+
     private final ProductService productService;
 
     public ProductController(ProductService productService) {
         this.productService = productService;
     }
 
-    @GetMapping("/product")
+    @GetMapping
     public List<Product> getAllProducts() {
-        return productService.listproducts();
+        return productService.listProducts();
+    }
+    @GetMapping("/{productId}")
+    public Product getProductById(@PathVariable int productId) {
+        return productService.getProductById(productId);
     }
 
-    // Xem chi tiết sản phẩm
-    @GetMapping("/productid")
-    public Product productById(int productId) {
-        return productService.productById(productId);
-    }
-
-    @GetMapping("/productIds")
-    public ResponseEntity<List<Product>> productByIds(@RequestParam("ids") String ids) {
+    @GetMapping("/by-ids/{ids}")
+    public ResponseEntity<List<Product>> getProductsByIds(@PathVariable String ids) {
         try {
             List<Integer> productIds = Arrays.stream(ids.split(",")).map(Integer::parseInt).toList();
-            List<Product> products = productService.findProductsByIds(productIds);
-            return ResponseEntity.ok(products);
+            return ResponseEntity.ok(productService.findProductsByIds(productIds));
         } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();
+            return ResponseEntity.badRequest().build();
         }
     }
 
     @InitBinder
     protected void initBinder(WebDataBinder binder) {
-        // Xử lý dữ liệu đầu vào cho Integer: Chuyển "null" hoặc chuỗi rỗng thành null
         binder.registerCustomEditor(Integer.class, new PropertyEditorSupport() {
             @Override
             public void setAsText(String text) {
-                if (text == null || text.trim().equalsIgnoreCase("null") || text.trim().isEmpty()) {
+                try {
+                    setValue((text == null || text.trim().isEmpty() || "null".equalsIgnoreCase(text)) ? null : Integer.parseInt(text));
+                } catch (NumberFormatException e) {
                     setValue(null);
-                } else {
-                    try {
-                        setValue(Integer.parseInt(text));
-                    } catch (NumberFormatException e) {
-                        setValue(null); // Nếu không phải số hợp lệ, đặt giá trị null
-                    }
                 }
             }
         });
     }
 
-    // thêm mới 1 sản phấm
-    @PostMapping(value = "/addproduct", consumes = "multipart/form-data")
+    @PostMapping(consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Messageresponse<Product>> addProduct(@Valid @ModelAttribute ProductDto productDto,
                                                                BindingResult bindingResult) throws IOException {
-        String filename = storeFile(productDto.getAvatarImage());
-
         if (bindingResult.hasErrors()) {
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            String message = errors.stream()
-                    .map(error -> {
-                        if (error.getField().equals("quantity") || error.getField().equals("price")) {
-                            return "Giá trị nhập vào sai định dạng";
-                        }
-                        return error.getDefaultMessage();
-                    })
-                    .collect(Collectors.joining(", ")); // Gộp tất cả lỗi thành chuỗi
-
-            Messageresponse<Product> response = new Messageresponse<>(201, message);
-            return ResponseEntity.ok(response);
+            String message = bindingResult.getFieldErrors().stream()
+                    .map(error -> List.of("quantity", "price").contains(error.getField()) ? "Giá trị nhập vào sai định dạng" : error.getDefaultMessage())
+                    .collect(Collectors.joining(", "));
+            return ResponseEntity.ok(new Messageresponse<>(400, message));
         }
-
-        Product product = productService.createproduct(productDto, filename);
-        Messageresponse<Product> response = new Messageresponse<>(200, "Thêm mới sản phẩm thành công", product);
-        return ResponseEntity.ok(response);
+        String filename = storeFile(productDto.getAvatarImage());
+        Product product = productService.createProduct(productDto, filename);
+        return ResponseEntity.ok(new Messageresponse<>(200, "Thêm mới sản phẩm thành công", product));
     }
 
-    @PutMapping(value = "/updateproduct/{id}", consumes = "multipart/form-data")
+    @PutMapping(value = "/{id}", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<Messageresponse<Product>> updateProduct(@ModelAttribute ProductDto productDto,
                                                                   BindingResult bindingResult,
                                                                   @PathVariable Integer id) throws IOException {
         String filename = null;
-        // Kiểm tra nếu người dùng có tải lên ảnh mới
         if (productDto.getAvatarImage() != null && !productDto.getAvatarImage().isEmpty()) {
-            filename = storeFile(productDto.getAvatarImage()); // lưu file mới
+            filename = storeFile(productDto.getAvatarImage());
         }
-        Product product = productService.updateproduct(productDto, id, filename);
-        Messageresponse<Product> response = new Messageresponse<>(202, "Cập nhật sản phẩm thành công", product);
-        return ResponseEntity.ok(response);
+        Product product = productService.updateProduct(productDto, id, filename);
+        return ResponseEntity.ok(new Messageresponse<>(200, "Cập nhật sản phẩm thành công", product));
+    }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<Messageresponse<Product>> deleteProduct(@PathVariable Integer id) {
+        productService.deleteProduct(id);
+        return ResponseEntity.ok(new Messageresponse<>(200, "Xóa sản phẩm thành công"));
+    }
+
+    @PostMapping("/bulk-delete")
+    public ResponseEntity<Messageresponse<List<Integer>>> deleteProducts(@RequestBody List<Integer> ids) {
+        if (ids == null || ids.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body(new Messageresponse<>(400, "Danh sách sản phẩm cần xóa không được để trống"));
+        }
+        List<Integer> notFoundIds = productService.deleteProducts(ids);
+        if (notFoundIds.isEmpty()) {
+            return ResponseEntity.ok(new Messageresponse<>(200, "Đã xóa tất cả sản phẩm thành công"));
+        } else {
+            return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                    .body(new Messageresponse<>(206, "Một số sản phẩm không tồn tại", notFoundIds));
+        }
+    }
+
+    @GetMapping("/images/{imagename}")
+    public ResponseEntity<Object> getProductImage(@PathVariable String imagename) {
+        try {
+            Path imagePath = Paths.get("uploads", imagename);
+            Resource resource = new UrlResource(imagePath.toUri());
+            if (!resource.exists()) {
+                return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                        .body("Image not found: " + imagename);
+            }
+
+            return ResponseEntity.ok()
+                    .contentType(MediaType.IMAGE_JPEG)
+                    .body(resource);
+
+        } catch (MalformedURLException e) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST)
+                    .body("Invalid image URL: " + e.getMessage());
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("An error occurred while fetching image: " + e.getMessage());
+        }
     }
 
     private String storeFile(MultipartFile file) throws IOException {
         if (file == null || file.getOriginalFilename() == null) {
-            throw new IllegalArgumentException("File or filename must not be null or empty");
+            throw new IllegalArgumentException("File hoặc tên file không được null hoặc rỗng");
         }
-        // Lấy định dạng file
-        String fileType = file.getContentType();
-        // Danh sách định dạng ảnh hợp lệ
         List<String> allowedTypes = List.of("image/jpeg", "image/png", "image/jpg", "image/gif");
-        // Kiểm tra nếu định dạng file không hợp lệ
-        if (!allowedTypes.contains(fileType)) {
+        if (!allowedTypes.contains(file.getContentType())) {
             throw new IllegalArgumentException("File không đúng định dạng! Chỉ chấp nhận JPG, PNG, GIF.");
         }
-        // Đảm bảo filename không phải null trước khi truyền vào cleanPath
-        String filename = StringUtils.cleanPath(Optional.ofNullable(file.getOriginalFilename()).orElse(""));
-        //Thêm UUID để đảm bảo file duy nhất
-        String uniqdnamefile = UUID.randomUUID().toString() + "." + filename;
-        // Đường dẫn đến thư mục muốn lưu file
+        String filename = UUID.randomUUID() + "." + StringUtils.cleanPath(Objects.requireNonNull(file.getOriginalFilename()));
         Path filepath = Paths.get("uploads");
-        //Kểm tra và tạo thư mục nếu nó không tồn tại
-        if (!Files.exists(filepath)) {
-            Files.createDirectories(filepath);
-        }
-        //Đường dẫn đầy đủ đến file
-        Path discus = Paths.get(filepath.toString(), uniqdnamefile);
-        //Sao chép file vào thư mục đích
-        Files.copy(file.getInputStream(), discus, StandardCopyOption.REPLACE_EXISTING);
-        return uniqdnamefile;
+        if (!Files.exists(filepath)) Files.createDirectories(filepath);
+        Files.copy(file.getInputStream(), filepath.resolve(filename), StandardCopyOption.REPLACE_EXISTING);
+        return filename;
     }
-
-    //Xóa sản phẩm
-    @DeleteMapping("/delete-product/{id}")
-    public ResponseEntity<Messageresponse<Product>> deleteProduct(@PathVariable("id") Integer productId) {
-        productService.deleteproduct(productId);
-        Messageresponse<Product> response = new Messageresponse<>(200, "Xóa sản phẩm thành công");
-        return ResponseEntity.ok(response);
-    }
-
-    //Hàm xem thông tin ảnh
-    @GetMapping("/product/images/{imagename}")
-    public ResponseEntity<Resource> getProductImages(@PathVariable("imagename") String imagename) {
-        try {
-            Path imagePath = Paths.get("uploads/" + imagename);
-            UrlResource urlResource = new UrlResource(imagePath.toUri());
-            if (urlResource.exists()) {
-                return ResponseEntity.ok().contentType(MediaType.IMAGE_JPEG).body(urlResource);
-
-            } else {
-                return ResponseEntity.notFound().build();
-            }
-        } catch (MalformedURLException e) {
-            return ResponseEntity.notFound().build();
-        }
-    }
-    // Xóa nhiều sản phẩm cần xem lại
-
-    @PostMapping("delete-products")
-
-    public ResponseEntity<Messageresponse<List<Integer>>> deleteProducts(@RequestBody List<Integer> ids) {
-
-        try {
-            // Kiểm tra danh sách có rỗng không
-            if (ids == null || ids.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Danh sách nhân viên cần xóa không được để trống"));
-            }
-            // danh sách mã giảm giá cần xóa
-            List<Integer> notFoundIds = productService.deleteProducts(ids);
-            if (notFoundIds.isEmpty()) {
-                return ResponseEntity.ok(new Messageresponse<>(200, "Danh sách nhân viên đã được xóa thành công"));
-            } else {
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Một số nhân viên không tồn tại", notFoundIds));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(new Messageresponse<>(500, "Lỗi hệ thống:" + e.getMessage()));
-        }
-    }
-
 }

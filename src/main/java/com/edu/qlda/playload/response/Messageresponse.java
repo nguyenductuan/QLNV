@@ -1,10 +1,16 @@
 package com.edu.qlda.playload.response;
 
+/**
+ * A generic response wrapper class for API responses.
+ * Includes status, message, and optional data.
+ */
 public class Messageresponse<T> {
+
     private int status;
     private String message;
     private T data;
-    // Constructor
+
+    // Constructors
     public Messageresponse(int status, String message, T data) {
         this.status = status;
         this.message = message;
@@ -39,5 +45,15 @@ public class Messageresponse<T> {
 
     public void setData(T data) {
         this.data = data;
+    }
+
+    // Optional: toString() for logging/debugging
+    @Override
+    public String toString() {
+        return "Messageresponse{" +
+                "status=" + status +
+                ", message='" + message + '\'' +
+                ", data=" + data +
+                '}';
     }
 }
