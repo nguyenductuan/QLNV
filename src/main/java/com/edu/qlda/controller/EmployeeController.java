@@ -9,15 +9,18 @@ import com.edu.qlda.service.EmployeeService;
 import com.edu.qlda.service.ExcelService;
 import com.edu.qlda.service.PositionService;
 import com.edu.qlda.service.RoleService;
-
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
-
 import jakarta.validation.Valid;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.io.InputStreamResource;
-import org.springframework.http.*;
+
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
+
 import org.springframework.web.bind.annotation.*;
 
 import java.io.ByteArrayInputStream;
@@ -28,9 +31,7 @@ import java.util.stream.Collectors;
 @CrossOrigin("http://localhost:4200")
 @Tag(name = "Employee Controller", description = "API quản lý nhân viên, chức vụ, quyền hạn")
 public class EmployeeController {
-
-    private static final String ACTION_SUCCESS = "Thành công";
-
+    private static final String ACTIONSUCESS = "Thành công";
     private final EmployeeService employeeService;
     private final PositionService positionService;
     private final RoleService roleService;
@@ -46,125 +47,158 @@ public class EmployeeController {
         this.excelService = excelService;
     }
 
-    @GetMapping("/employee")
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    @GetMapping("/employee")
     public List<EmployeelistDto> getAllEmployees() {
-        return employeeService.getAllEmployees();
+        return employeeService.findAllEmployee();
     }
 
-    @GetMapping("/position")
     @Operation(summary = "Lấy danh sách tất cả chức vụ")
+    @GetMapping("/position")
     public List<Position> getAllPositions() {
-        return positionService.listPositions();
+        return positionService.listPosition();
     }
 
-    @GetMapping("/role")
     @Operation(summary = "Lấy danh sách tất cả quyền hạn")
+    @GetMapping("/role")
     public List<Role> getAllRoles() {
-        return roleService.getAllRoles();
+        return roleService.listRole();
     }
 
-    @GetMapping("/employee/{id}")
-    @Operation(summary = "Lấy thông tin nhân viên theo ID")
-    public EmployeelistDto getEmployeeById(@PathVariable int id) {
-        return employeeService.getEmployeeById(id);
+    // Lấy ds cá nhân theo id
+    @GetMapping("/employeebyId")
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public EmployeelistDto employeeById(int id) {
+        return employeeService.findEmployeeId(id);
     }
 
+    //Search cá nhân
     @GetMapping("/employee/search")
-    @Operation(summary = "Tìm kiếm nhân viên theo tên")
-    public List<EmployeelistDto> searchEmployees(@RequestParam(name = "name", required = false) String name) {
-        return employeeService.searchEmployeeByName(name);
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public List<EmployeelistDto> search(@RequestParam(name = "name", required = false) String name) {
+        return employeeService.searchEmployee(name);
     }
 
-    @PostMapping("/employee/search-advanced")
-    @Operation(summary = "Tìm kiếm nâng cao nhân viên")
-    public List<EmployeelistDto> searchEmployeesAdvanced(@RequestBody EmployeesearchDto dto) {
-        return employeeService.advancedSearchEmployees(dto);
+    @PostMapping("searchadvance")
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public List<EmployeelistDto> searchadvance(@RequestBody EmployeesearchDto employeesearchDto) {
+        return employeeService.searchadvance(employeesearchDto
+        );
     }
-    @PostMapping("/employee")
-    @Operation(summary = "Thêm mới nhân viên")
-    public ResponseEntity<Messageresponse<Employee>> createEmployee(@Valid @RequestBody Employee employee,
+
+    // Thêm mới cá nhân
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    @PostMapping("/addemployee")
+    public ResponseEntity<Messageresponse<Employee>> createemployee(@Valid @RequestBody Employee employeeDto,
                                                                     BindingResult bindingResult) {
         try {
             ResponseEntity<Messageresponse<Employee>> errorResponse = handleValidationErrors(bindingResult);
             if (errorResponse != null) return errorResponse;
-
-            employeeService.createEmployee(employee);
+            employeeService.createemployee(employeeDto);
             return ResponseEntity.ok(new Messageresponse<>(200, "Thêm nhân viên thành công"));
         } catch (Exception e) {
             return handleException(e);
         }
     }
-    @PutMapping("/employee/{id}")
-    @Operation(summary = "Cập nhật thông tin nhân viên")
-    public ResponseEntity<Messageresponse<Employee>> updateEmployee(@Valid @RequestBody Employee employee,
-                                                                    BindingResult bindingResult,
-                                                                    @PathVariable Integer id) {
+
+    //Cập nật cá nhân
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    @PutMapping("/updateemployee/{id}")
+    public ResponseEntity<Messageresponse<Employee>> updateemployee(@Valid @RequestBody Employee employeeDto,
+                                                                    BindingResult bindingResult, @PathVariable Integer id) {
         try {
             ResponseEntity<Messageresponse<Employee>> errorResponse = handleValidationErrors(bindingResult);
             if (errorResponse != null) return errorResponse;
-
-            employeeService.updateEmployee(employee, id);
-            return ResponseEntity.ok(new Messageresponse<>(200, "Cập nhật nhân viên thành công"));
+            employeeService.updateemployee(employeeDto, id);
+            Messageresponse<Employee> response = new Messageresponse<>(200, "Cập nhật nhân viên thành công");
+            return ResponseEntity.ok(response);
         } catch (Exception e) {
             return handleException(e);
         }
     }
-    @DeleteMapping("/employee/{id}")
-    @Operation(summary = "Xóa nhân viên theo ID")
-    public void deleteEmployee(@PathVariable Integer id) {
-        employeeService.deleteEmployee(id);
+
+    //Xóa cá nhân
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    @DeleteMapping("delete-employee/{id}")
+    public void deleteemployee(@PathVariable Integer id) {
+        employeeService.deleteemployee(id);
     }
 
-    @PostMapping("/employee/delete-multiple")
-    @Operation(summary = "Xóa nhiều nhân viên")
-    public ResponseEntity<Messageresponse<List<Integer>>> deleteEmployees(@RequestBody List<Integer> ids) {
-        try {
-            if (ids == null || ids.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.BAD_REQUEST)
-                        .body(new Messageresponse<>(400, "Danh sách nhân viên cần xóa không được để trống"));
-            }
-
-            List<Integer> notFoundIds = employeeService.deleteEmployees(ids);
-            if (notFoundIds.isEmpty()) {
-                return ResponseEntity.ok(new Messageresponse<>(200, "Xóa nhân viên thành công"));
-            } else {
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
-                        .body(new Messageresponse<>(404, "Một số nhân viên không tồn tại", notFoundIds));
-            }
-        } catch (Exception e) {
-            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body(new Messageresponse<>(500, "Lỗi hệ thống: " + e.getMessage()));
+    @PostMapping(value = "/login")
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public ResponseEntity<Messageresponse<Void>> login(@RequestBody Loginrequest request) {
+        String email = request.getEmail();
+        String password = request.getPassword();
+        Employee employee = employeeService.isUserValid(email, password);
+        if (employee != null) {
+            // Tạo một Response object
+            Messageresponse<Void> response = new Messageresponse(
+                    200, ACTIONSUCESS,
+                    new Employee[]{employee}
+            );
+            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
+            return ResponseEntity.status(HttpStatus.OK).body(response);
+        } else {
+            // Tạo một Response object
+            Messageresponse response = new Messageresponse(400, "Tài khoản không tồn tại", "");
+            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
+            return ResponseEntity.status(HttpStatus.OK).body(response);
         }
     }
-    @GetMapping("/employee/export-excel")
-    @Operation(summary = "Xuất danh sách nhân viên ra Excel")
-    public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
-        List<Employee> employees = employeeService.getAllEmployeeEntities();
-        ByteArrayInputStream in = excelService.generateExcel(employees);
 
+    //Xuất Excel
+    @GetMapping("employee/export-excel")
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public ResponseEntity<InputStreamResource> exportEmployeesToExcel() {
+        List<Employee> employees = employeeService.listemployee();
+        ByteArrayInputStream in = excelService.generateExcel(employees);
         HttpHeaders headers = new HttpHeaders();
         headers.add("Content-Disposition", "attachment; filename=employees.xlsx");
-
         return ResponseEntity.ok()
                 .headers(headers)
-                .contentType(MediaType.parseMediaType(
-                        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
+                .contentType(MediaType.parseMediaType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"))
                 .body(new InputStreamResource(in));
     }
 
+    // Xóa nhiều cá nhân
+    @PostMapping("delete-employees")
+    @Operation(summary = "Lấy danh sách tất cả nhân viên")
+    public ResponseEntity<Messageresponse<List<Integer>>> deleteEmployees(@RequestBody List<Integer> ids) {
+
+        try {
+            // Kiểm tra danh sách có rỗng không
+            if (ids == null || ids.isEmpty()) {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(
+                        new Messageresponse<>(404, "Danh sách nhân viên cần xóa không được để trống"));
+            }
+            // danh sách mã giảm giá cần xóa
+            List<Integer> notFoundIds = employeeService.deleteEmployees(ids);
+            if (notFoundIds.isEmpty()) {
+                return ResponseEntity.ok(
+                        new Messageresponse<>(200, "Danh sách nhân viên đã được xóa thành công"));
+            } else {
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(
+                        new Messageresponse<>(404, "Một số nhân viên không tồn tại", notFoundIds));
+            }
+        } catch (Exception e) {
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(
+                    new Messageresponse<>(500, "Lỗi hệ thống:" + e.getMessage()));
+        }
+    }
+
+    // Phương thức xử lý chung
     private ResponseEntity<Messageresponse<Employee>> handleValidationErrors(BindingResult bindingResult) {
         if (bindingResult.hasErrors()) {
             String message = bindingResult.getFieldErrors().stream()
                     .map(DefaultMessageSourceResolvable::getDefaultMessage)
                     .collect(Collectors.joining(", "));
-            return ResponseEntity.badRequest().body(new Messageresponse<>(400, message));
+            return ResponseEntity.ok(new Messageresponse<>(201, message));
         }
         return null;
     }
 
     private ResponseEntity<Messageresponse<Employee>> handleException(Exception e) {
-        return ResponseEntity.status(HttpStatus.CONFLICT)
-                .body(new Messageresponse<>(409, e.getMessage()));
+        return ResponseEntity.status(HttpStatus.CONFLICT).body(new Messageresponse<>(409, e.getMessage()));
     }
+
 }
