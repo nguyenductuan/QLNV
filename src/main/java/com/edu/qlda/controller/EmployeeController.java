@@ -12,6 +12,10 @@ import com.edu.qlda.service.RoleService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import org.apache.poi.ss.usermodel.Row;
+import org.apache.poi.ss.usermodel.Sheet;
+import org.apache.poi.ss.usermodel.Workbook;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.springframework.context.support.DefaultMessageSourceResolvable;
 import org.springframework.core.io.InputStreamResource;
 
@@ -22,8 +26,11 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.validation.BindingResult;
 
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.multipart.MultipartFile;
 
 import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -200,5 +207,35 @@ public class EmployeeController {
     private ResponseEntity<Messageresponse<Employee>> handleException(Exception e) {
         return ResponseEntity.status(HttpStatus.CONFLICT).body(new Messageresponse<>(409, e.getMessage()));
     }
+  
+    @PostMapping("/import")
+    public String importEmployees(@RequestParam("file") MultipartFile file) {
+        try {
+            List<Employee> employees = parseExcel(file.getInputStream());
+            // Lưu vào database
+            // employeeRepository.saveAll(employees);
 
+            return "Imported " + employees.size() + " employees!";
+        } catch (Exception e) {
+            e.printStackTrace();
+            return "Failed to import: " + e.getMessage();
+        }
+    }
+
+    private List<Employee> parseExcel(InputStream is) throws Exception {
+        List<Employee> employees = new ArrayList<>();
+        Workbook workbook = new XSSFWorkbook(is);
+        Sheet sheet = workbook.getSheetAt(0);
+        for (Row row : sheet) {
+            if (row.getRowNum() == 0) continue; // Bỏ qua header
+            Employee emp = new Employee();
+            emp.setName(row.getCell(0).getStringCellValue());
+            emp.setEmail(row.getCell(1).getStringCellValue());
+            emp.setPhone(row.getCell(2).getStringCellValue());
+            employees.add(emp);
+        }
+        workbook.close();
+        return employees;
+    }
+}
 }
