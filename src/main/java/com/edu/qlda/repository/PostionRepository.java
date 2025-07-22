@@ -5,7 +5,7 @@ import org.springframework.data.jpa.repository.Query;
 
 import java.util.List;
 
-public interface PositionRepository extends JpaRepository<Position,Integer> {
+public interface PostionRepository extends JpaRepository<Position,Integer> {
     @Query(value = "select position_id, name  from position", nativeQuery = true)
-    List<Position> findAllPositions();
+    List<Position> findAllPostion();
 }

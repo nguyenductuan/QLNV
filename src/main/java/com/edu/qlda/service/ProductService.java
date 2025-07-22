@@ -3,74 +3,60 @@ package com.edu.qlda.service;
 import com.edu.qlda.dto.ProductDto;
 import com.edu.qlda.entity.Category;
 import com.edu.qlda.entity.Product;
+
 import com.edu.qlda.repository.CategoryRepository;
 import com.edu.qlda.repository.ProductRepository;
 import org.springframework.stereotype.Service;
-
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
 @Service
 public class ProductService {
-
     private final ProductRepository productRepository;
     private final CategoryRepository categoryRepository;
-
-    public ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
+    public  ProductService(ProductRepository productRepository, CategoryRepository categoryRepository) {
         this.productRepository = productRepository;
         this.categoryRepository = categoryRepository;
     }
-
-    public List<Product> listProducts() {
-        return productRepository.findAll();
+    public List<Product> listproducts(){
+        return  productRepository.findAll();
     }
-
-    public List<Product> findProductsByIds(List<Integer> productIds) {
+    public List<Product> findProductsByIds( List<Integer> productIds){
         return productRepository.findProductsByIds(productIds);
     }
-
-    public Product getProductById(Integer productId) {
-        return productRepository.findByIdProduct(productId);
-    }
-
-    public Product createProduct(ProductDto productDto, String filename) {
-        Category category = categoryRepository.findById(productDto.getCategoryid())
-                .orElseThrow(() -> new RuntimeException("Danh mục sản phẩm không tồn tại"));
-
-        Product product = new Product();
-        product.setName(productDto.getName());
-        product.setCategory(category);
-        product.setStatus(productDto.getStatus());
-        product.setCreatedate(LocalDate.now());
-        product.setPrice(productDto.getPrice());
-        product.setThumbnail(filename);
-        product.setQuantity(productDto.getQuantity());
-
-        return productRepository.save(product);
-    }
-
-    public Product updateProduct(ProductDto productDto, Integer id, String filename) {
-        Product product = getProductById(id);
-        if (product == null) {
-            throw new RuntimeException("Sản phẩm không tồn tại");
-        }
-
-        product.setName(productDto.getName());
-        product.setPrice(productDto.getPrice());
+    public Product productById(Integer  productId){
+        return  productRepository.findByIdProduct(productId);
+}
+    public Product createproduct(ProductDto productDto, String filename){
+       Category exitcategory =  categoryRepository.findById(productDto.getCategoryid())
+               .orElseThrow(()->new RuntimeException("Danh mục sản phẩm không tồn tại"));
+       Product product= new Product();
+       product.setName(productDto.getName());
+       product.setCategory(exitcategory);
+       product.setStatus(productDto.getStatus());
+       product.setCreatedate(LocalDate.now());
+       product.setPrice(productDto.getPrice());
+       product.setThumbnail(filename);
+       product.setQuantity(productDto.getQuantity());
+       return productRepository.save(product);
+}
+    public Product updateproduct(ProductDto productDto, Integer id, String filename){
+        Product existingProductOpt = productById(id);
+        existingProductOpt.setName(productDto.getName());
+        existingProductOpt.setPrice(productDto.getPrice());
+        // Nếu có ảnh thì lưu aảnh mới
         if (filename != null) {
-            product.setThumbnail(filename);
+            existingProductOpt.setThumbnail(filename);
         }
-        product.setUpdatedate(LocalDate.now());
-        product.setQuantity(productDto.getQuantity());
-
-        return productRepository.save(product);
+        existingProductOpt.setUpdatedate(LocalDate.now());
+        existingProductOpt.setQuantity(productDto.getQuantity());
+        return productRepository.save(existingProductOpt);
     }
-
-    public void deleteProduct(Integer id) {
+    public void deleteproduct(Integer id){
         productRepository.deleteById(id);
     }
-
+// xóa nhiều sản phẩm
     public List<Integer> deleteProducts(List<Integer> ids) {
         List<Integer> notFoundIds = new ArrayList<>();
         for (Integer id : ids) {
@@ -82,4 +68,5 @@ public class ProductService {
         }
         return notFoundIds;
     }
+
 }
