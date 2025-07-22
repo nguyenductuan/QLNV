@@ -2,7 +2,7 @@ package com.edu.qlda.controller;
 
 import com.edu.qlda.dto.ProductDto;
 import com.edu.qlda.entity.Product;
-import com.edu.qlda.playload.response.Messageresponse;
+import com.edu.qlda.playload.response.response.Messageresponse;
 import com.edu.qlda.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;

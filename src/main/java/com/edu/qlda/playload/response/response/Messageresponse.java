@@ -1,4 +1,4 @@
-package com.edu.qlda.playload.response;
+package com.edu.qlda.playload.response.response;
 
 /**
  * A generic response wrapper class for API responses.

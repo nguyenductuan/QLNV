@@ -2,7 +2,7 @@ package com.edu.qlda.controller;
 
 import com.edu.qlda.dto.DiscountDto;
 import com.edu.qlda.entity.Discount;
-import com.edu.qlda.playload.response.Messageresponse;
+import com.edu.qlda.playload.response.response.Messageresponse;
 import com.edu.qlda.service.DiscountService;
 
 import jakarta.validation.Valid;

@@ -2,7 +2,7 @@ package com.edu.qlda.controller;
 
 import com.edu.qlda.dto.OrderDto;
 import com.edu.qlda.entity.Orders;
-import com.edu.qlda.playload.response.Messageresponse;
+import com.edu.qlda.playload.response.response.Messageresponse;
 import com.edu.qlda.service.OrderService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
