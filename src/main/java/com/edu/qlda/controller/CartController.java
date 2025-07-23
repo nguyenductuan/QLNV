@@ -43,7 +43,7 @@ public class CartController {
 
     @DeleteMapping("/delete/{id}")
     public ResponseEntity<Messageresponse<Void>> deleteCartItem(@PathVariable Integer id) {
-        cartService.deleteProduct(id);
+        //cartService.deleteProduct(id);
         return ResponseEntity.ok(new Messageresponse<>(200, ACTION_SUCCESS));
     }
 

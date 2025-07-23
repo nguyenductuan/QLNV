@@ -29,12 +29,12 @@ public class DiscountController {
 
     @GetMapping
     public ResponseEntity<List<Discount>> getAllDiscounts() {
-        return ResponseEntity.ok(discountService.getAllDiscounts());
+        return ResponseEntity.ok(discountService.listDiscount());
     }
 
     @PostMapping("/apply")
     public ResponseEntity<Integer> applyDiscount(@RequestBody DiscountDto request) {
-        Integer discountedAmount = discountService.applyDiscount(request.getTotalAmount(), request.getSelectedDiscount());
+        Integer discountedAmount = discountService.appDiscount(request.getTotalAmount(), request.getSelectedDiscount());
         return ResponseEntity.ok(discountedAmount);
     }
 
@@ -58,7 +58,7 @@ public class DiscountController {
         ResponseEntity<Messageresponse<Void>> errorResponse = handleValidationErrors(bindingResult);
         if (errorResponse != null) return errorResponse;
 
-        Optional<Discount> discount = discountService.getDiscountById(id);
+        Optional<Discount> discount = discountService.getDiscountByID(id);
         if (discount.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new Messageresponse<>(404, "Mã giảm giá không tồn tại trong hệ thống"));
@@ -74,7 +74,7 @@ public class DiscountController {
 
     @DeleteMapping("/{id}")
     public ResponseEntity<Messageresponse<Void>> deleteDiscount(@PathVariable Integer id) {
-        Optional<Discount> discount = discountService.getDiscountById(id);
+        Optional<Discount> discount = discountService.getDiscountByID(id);
         if (discount.isEmpty()) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND)
                     .body(new Messageresponse<>(404, "Mã giảm giá không tồn tại trong hệ thống"));
