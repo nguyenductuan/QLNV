@@ -14,11 +14,10 @@ public class ImportService {
     public void processFile(MultipartFile file) throws IOException {
         try (InputStream is = file.getInputStream();
              Workbook workbook = new XSSFWorkbook(is)) {
-
-            Sheet sheet = workbook.getSheetAt(1);
+            Sheet sheet = workbook.getSheetAt(0);
             for (Row row : sheet) {
                 // Bỏ qua dòng tiêu đề
-                if (row.getRowNum() == 1) continue;
+                if (row.getRowNum() == 0) continue;
 
                 String name = row.getCell(1).getStringCellValue();
                // int age = (int) row.getCell(1).getNumericCellValue();

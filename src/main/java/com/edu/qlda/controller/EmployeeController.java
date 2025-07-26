@@ -133,27 +133,6 @@ public class EmployeeController {
         employeeService.deleteemployee(id);
     }
 
-//    @PostMapping(value = "/login")
-//    @Operation(summary = "Lấy danh sách tất cả nhân viên")
-//    public ResponseEntity<Messageresponse<Void>> login(@RequestBody Loginrequest request) {
-//        String email = request.getEmail();
-//        String password = request.getPassword();
-//        Employee employee = employeeService.isUserValid(email, password);
-//        if (employee != null) {
-//            // Tạo một Response object
-//            Messageresponse<Void> response = new Messageresponse(
-//                    200, ACTIONSUCESS,
-//                    new Employee[]{employee}
-//            );
-//            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
-//            return ResponseEntity.status(HttpStatus.OK).body(response);
-//        } else {
-//            // Tạo một Response object
-//            Messageresponse response = new Messageresponse(400, "Tài khoản không tồn tại", "");
-//            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
-//            return ResponseEntity.status(HttpStatus.OK).body(response);
-//        }
-//    }
 
     //Xuất Excel
     @GetMapping("employee/export-excel")
@@ -230,24 +209,6 @@ public class EmployeeController {
                 return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi xử lý file: " + e.getMessage());
             }
         }
-
-
-
-    private List<Employee> parseExcel(InputStream is) throws Exception {
-        List<Employee> employees = new ArrayList<>();
-        Workbook workbook = new XSSFWorkbook(is);
-        Sheet sheet = workbook.getSheetAt(0);
-        for (Row row : sheet) {
-            if (row.getRowNum() == 0) continue; // Bỏ qua header
-            Employee emp = new Employee();
-            emp.setName(row.getCell(0).getStringCellValue());
-            emp.setEmail(row.getCell(1).getStringCellValue());
-            emp.setPhone(row.getCell(2).getStringCellValue());
-            employees.add(emp);
-        }
-        workbook.close();
-        return employees;
-    }
 
 
 }
