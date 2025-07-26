@@ -5,13 +5,11 @@ import com.edu.qlda.entity.Employee;
 import com.edu.qlda.entity.Position;
 import com.edu.qlda.entity.Role;
 import com.edu.qlda.playload.response.Messageresponse;
-import com.edu.qlda.service.EmployeeService;
-import com.edu.qlda.service.ExcelService;
-import com.edu.qlda.service.PositionService;
-import com.edu.qlda.service.RoleService;
+import com.edu.qlda.service.*;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
+import lombok.extern.slf4j.Slf4j;
 import org.apache.poi.ss.usermodel.Row;
 import org.apache.poi.ss.usermodel.Sheet;
 import org.apache.poi.ss.usermodel.Workbook;
@@ -34,6 +32,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
 
+@Slf4j
 @RestController
 @CrossOrigin("http://localhost:4200")
 @Tag(name = "Employee Controller", description = "API quản lý nhân viên, chức vụ, quyền hạn")
@@ -43,15 +42,18 @@ public class EmployeeController {
     private final PositionService positionService;
     private final RoleService roleService;
     private final ExcelService excelService;
+    private final ImportService importService;
 
     public EmployeeController(EmployeeService employeeService,
                               PositionService positionService,
                               RoleService roleService,
-                              ExcelService excelService) {
+                              ExcelService excelService,
+                              ImportService importService) {
         this.employeeService = employeeService;
         this.positionService = positionService;
         this.roleService = roleService;
         this.excelService = excelService;
+        this.importService = importService;
     }
 
     @Operation(summary = "Lấy danh sách tất cả nhân viên")
@@ -131,27 +133,6 @@ public class EmployeeController {
         employeeService.deleteemployee(id);
     }
 
-    @PostMapping(value = "/login")
-    @Operation(summary = "Lấy danh sách tất cả nhân viên")
-    public ResponseEntity<Messageresponse<Void>> login(@RequestBody Loginrequest request) {
-        String email = request.getEmail();
-        String password = request.getPassword();
-        Employee employee = employeeService.isUserValid(email, password);
-        if (employee != null) {
-            // Tạo một Response object
-            Messageresponse<Void> response = new Messageresponse(
-                    200, ACTIONSUCESS,
-                    new Employee[]{employee}
-            );
-            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        } else {
-            // Tạo một Response object
-            Messageresponse response = new Messageresponse(400, "Tài khoản không tồn tại", "");
-            // Trả về ResponseEntity với mã trạng thái HTTP là OK (200)
-            return ResponseEntity.status(HttpStatus.OK).body(response);
-        }
-    }
 
     //Xuất Excel
     @GetMapping("employee/export-excel")
@@ -209,33 +190,26 @@ public class EmployeeController {
     }
   
     @PostMapping("/import")
-    public String importEmployees(@RequestParam("file") MultipartFile file) {
-        try {
-            List<Employee> employees = parseExcel(file.getInputStream());
-            // Lưu vào database
-            // employeeRepository.saveAll(employees);
 
-            return "Imported " + employees.size() + " employees!";
-        } catch (Exception e) {
-            e.printStackTrace();
-            return "Failed to import: " + e.getMessage();
-        }
-    }
+        public ResponseEntity<?> uploadFile(@RequestParam("file") MultipartFile file) {
+            if (file.isEmpty()) {
+                return ResponseEntity.badRequest().body("Vui lòng chọn một file để upload.");
+            }
 
-    private List<Employee> parseExcel(InputStream is) throws Exception {
-        List<Employee> employees = new ArrayList<>();
-        Workbook workbook = new XSSFWorkbook(is);
-        Sheet sheet = workbook.getSheetAt(0);
-        for (Row row : sheet) {
-            if (row.getRowNum() == 0) continue; // Bỏ qua header
-            Employee emp = new Employee();
-            emp.setName(row.getCell(0).getStringCellValue());
-            emp.setEmail(row.getCell(1).getStringCellValue());
-            emp.setPhone(row.getCell(2).getStringCellValue());
-            employees.add(emp);
+            try {
+                // Xử lý file (ví dụ CSV/Excel)
+
+                String message = file.getOriginalFilename() + " được tải lên thành công.";
+
+                // Gọi service xử lý nội dung file
+               importService.processFile(file);
+
+                return ResponseEntity.ok(message);
+            } catch (Exception e) {
+                return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body("Lỗi xử lý file: " + e.getMessage());
+            }
         }
-        workbook.close();
-        return employees;
-    }
+
+
 }
-}
+

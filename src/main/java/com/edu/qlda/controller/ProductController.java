@@ -1,14 +1,20 @@
 package com.edu.qlda.controller;
 
+import com.edu.qlda.dto.PageInfo;
 import com.edu.qlda.dto.ProductDto;
 
 
+import com.edu.qlda.entity.Category;
 import com.edu.qlda.entity.Product;
+import com.edu.qlda.playload.response.ApiResponse;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.ProductService;
 import jakarta.validation.Valid;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.UrlResource;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -44,6 +50,26 @@ public class ProductController {
         return productService.listproducts();
     }
 
+    @GetMapping ("/products")
+    public ResponseEntity<ApiResponse<List<Product>>> getAllProducts(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam (defaultValue = "1")   Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Product> page = productService.listproduct(pageable);
+        PageInfo pageInfo =  new PageInfo();
+
+        pageInfo.setPageNo( page.getNumber() + 1 );
+        pageInfo.setPageSize(page.getSize());
+        pageInfo.setTotalCount(page.getTotalElements());
+        pageInfo.setTotalPage(page.getTotalPages());
+
+        ApiResponse<List<Product>> response = new ApiResponse<>();
+        response.setMessage("Successfully!");
+        response.setPageInfo(pageInfo);
+        response.setData(page.getContent());
+
+        return ResponseEntity.ok(response);
+    }
     // Xem chi tiết sản phẩm
     @GetMapping("/productid")
     public Product productById(int productId) {

@@ -1,9 +1,14 @@
 package com.edu.qlda.controller;
 
+import com.edu.qlda.dto.PageInfo;
 import com.edu.qlda.entity.Category;
+import com.edu.qlda.playload.response.ApiResponse;
 import com.edu.qlda.playload.response.Messageresponse;
 import com.edu.qlda.service.CategoryService;
 import jakarta.validation.Valid;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -22,6 +27,26 @@ public class CategoryController {
     @GetMapping("/category")
     public List<Category> getAllCategorys() {
         return categoryService.listcategorys();
+    }
+    @GetMapping ("/categories")
+    public ResponseEntity<ApiResponse<List<Category>>> getAllCategories(
+            @RequestParam(defaultValue = "0") Integer pageNo,
+            @RequestParam (defaultValue = "1")   Integer pageSize) {
+        Pageable pageable = PageRequest.of(pageNo, pageSize);
+        Page<Category> page = categoryService.listCategories(pageable);
+        PageInfo pageInfo =  new PageInfo();
+
+        pageInfo.setPageNo( page.getNumber() + 1 );
+        pageInfo.setPageSize(page.getSize());
+        pageInfo.setTotalCount(page.getTotalElements());
+        pageInfo.setTotalPage(page.getTotalPages());
+
+       ApiResponse<List<Category>> response = new ApiResponse<>();
+        response.setMessage("Successfully!");
+        response.setPageInfo(pageInfo);
+        response.setData(page.getContent());
+
+        return ResponseEntity.ok(response);
     }
 
     // Thêm mới nhóm sản phẩm
@@ -60,7 +85,10 @@ public class CategoryController {
         try {
             // Kiểm tra danh sách có rỗng không
             if (ids == null || ids.isEmpty()) {
-                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT).body(new Messageresponse<>(404, "Danh sách mã giảm giá cần xóa không được để trống"));
+                return ResponseEntity.status(HttpStatus.PARTIAL_CONTENT)
+                        .body(new Messageresponse<>(
+                                404,
+                                "Danh sách mã giảm giá cần xóa không được để trống"));
             }
             // danh sách mã giảm giá cần xóa
             List<Integer> notFoundIds = categoryService.deleteCategorys(ids);

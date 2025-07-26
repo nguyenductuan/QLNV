@@ -4,6 +4,9 @@ import com.edu.qlda.entity.Category;
 import com.edu.qlda.exception.ValidationException;
 import com.edu.qlda.repository.CategoryRepository;
 
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -19,6 +22,9 @@ public class CategoryService {
     }
     public List<Category> listcategorys() {
         return categoryRepository.findAll();
+    }
+    public Page<Category> listCategories(Pageable pageable) {
+        return categoryRepository.findAll(pageable);
     }
     public Category createCategory(Category request) {
         if (categoryRepository.existsByName(request.getName())) {
