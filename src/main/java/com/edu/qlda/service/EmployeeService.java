@@ -108,4 +108,22 @@ public class EmployeeService {
         return notFoundIds;
     }
 
+    //login
+    public boolean validateUsers(String username, String password) {
+        Employee user = getAccountByEmail(username);
+        return user != null && matches(password, user.getPassword());
+
+
+    }
+    public Employee getAccountByEmail(String username) {
+        return employeeRepository.findByName(username);
+    }
+
+//    public Employee validateUser(String email, String password) {
+//        Employee user = getAccountByEmail(email);
+//        if (user != null && matches(password, user.getPassword())) {
+//            return user;
+//        }
+//        return null;
+//    }
 }

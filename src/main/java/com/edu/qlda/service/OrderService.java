@@ -7,6 +7,8 @@ import com.edu.qlda.entity.Product;
 import com.edu.qlda.repository.OrderDetailRepository;
 import com.edu.qlda.repository.OrderRepository;
 import com.edu.qlda.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.sql.Date;
 import java.time.LocalDate;
@@ -24,9 +26,13 @@ public  OrderService(OrderRepository orderRepository, ProductRepository productR
     this.productRepository = productRepository;
     this.orderDetailRepository = orderDetailRepository;
 }
-public List<Orders> listOrder (){
+public List<Orders> listOrders (){
 return  orderRepository.findAll();
 }
+
+    public Page<Orders> listOrder (Pageable  pageable) {
+        return  orderRepository.findAll(pageable);
+    }
     public Orders createOrder(OrderDto orderDto) {
         Orders orders = new Orders();
         orders.setAddress(orderDto.getAddress());

@@ -6,6 +6,8 @@ import com.edu.qlda.entity.Product;
 
 import com.edu.qlda.repository.CategoryRepository;
 import com.edu.qlda.repository.ProductRepository;
+import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -21,6 +23,9 @@ public class ProductService {
     }
     public List<Product> listproducts(){
         return  productRepository.findAll();
+    }
+    public Page<Product> listproduct(Pageable pageable){
+        return productRepository.findAll(pageable);
     }
     public List<Product> findProductsByIds( List<Integer> productIds){
         return productRepository.findProductsByIds(productIds);
