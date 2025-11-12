@@ -18,10 +18,7 @@ public class ImportService {
             for (Row row : sheet) {
                 // Bỏ qua dòng tiêu đề
                 if (row.getRowNum() == 0) continue;
-
                 String name = row.getCell(1).getStringCellValue();
-               // int age = (int) row.getCell(1).getNumericCellValue();
-
                 System.out.println("Tên: " + name);
 
                 // Có thể lưu vào database tại đây

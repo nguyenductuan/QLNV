@@ -2,9 +2,6 @@ package com.edu.qlda.controller;
 
 import com.edu.qlda.dto.PageInfo;
 import com.edu.qlda.dto.ProductDto;
-
-
-import com.edu.qlda.entity.Category;
 import com.edu.qlda.entity.Product;
 import com.edu.qlda.playload.response.ApiResponse;
 import com.edu.qlda.playload.response.Messageresponse;
@@ -57,22 +54,19 @@ public class ProductController {
         Pageable pageable = PageRequest.of(pageNo, pageSize);
         Page<Product> page = productService.listproduct(pageable);
         PageInfo pageInfo =  new PageInfo();
-
         pageInfo.setPageNo( page.getNumber() + 1 );
         pageInfo.setPageSize(page.getSize());
         pageInfo.setTotalCount(page.getTotalElements());
         pageInfo.setTotalPage(page.getTotalPages());
-
         ApiResponse<List<Product>> response = new ApiResponse<>();
         response.setMessage("Successfully!");
         response.setPageInfo(pageInfo);
         response.setData(page.getContent());
-
         return ResponseEntity.ok(response);
     }
     // Xem chi tiết sản phẩm
-    @GetMapping("/productid")
-    public Product productById(int productId) {
+    @GetMapping("/products/{id}")
+    public Product productById( @PathVariable("id") int productId) {
         return productService.productById(productId);
     }
 
@@ -174,7 +168,6 @@ public class ProductController {
         Files.copy(file.getInputStream(), discus, StandardCopyOption.REPLACE_EXISTING);
         return uniqdnamefile;
     }
-
     //Xóa sản phẩm
     @DeleteMapping("/delete-product/{id}")
     public ResponseEntity<Messageresponse<Product>> deleteProduct(@PathVariable("id") Integer productId) {

@@ -64,7 +64,7 @@ public class CategoryController {
     }
 
     // Xem chi tết nhóm sản phẩm
-    @GetMapping("/{id}")
+    @GetMapping("/category/{id}")
     public ResponseEntity<Category> getCategoryById(@PathVariable Integer id) {
         Category category = categoryService.getCategoryById(id);
         return ResponseEntity.ok(category);
