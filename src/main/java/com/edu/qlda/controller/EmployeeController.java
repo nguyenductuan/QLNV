@@ -218,7 +218,7 @@ public class EmployeeController {
             return "Imported " + employees.size() + " employees!";
         } catch (Exception e) {
             e.printStackTrace();
-            return "Failed to import: " + e.getMessage();
+            return "Failed to import employees.";
         }
     }
 
